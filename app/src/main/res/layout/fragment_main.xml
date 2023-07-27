@@ -72,54 +72,107 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
-                android:id="@+id/id_cur_max_min"
+                android:id="@+id/id_cur_max"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:backgroundTint="#54296A"
                 android:fontFamily="@font/amiko"
-                android:gravity="center"
-                android:text="30 °C / 18 °C"
+                android:gravity="right"
+                android:text="30 °C"
                 android:textAllCaps="false"
                 android:textColor="#0E0721"
                 android:textSize="48sp"
-                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/id_slashone"
+                app:layout_constraintHorizontal_bias="1.0"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/id_cur_data" />
 
             <TextView
-                android:id="@+id/id_real_feel_text"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:backgroundTint="#54296A"
-                android:fontFamily="@font/amiko_semibold"
-                android:gravity="center"
-                android:text="Real feel"
-                android:textAllCaps="false"
-                android:textColor="@color/white"
-                android:textSize="24sp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/id_cur_max_min" />
-
-            <TextView
-                android:id="@+id/id_cur_rf_max_min"
+                android:id="@+id/id_slashone"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:backgroundTint="#54296A"
                 android:fontFamily="@font/amiko"
                 android:gravity="center"
-                android:text="35 °C / 18 °C"
+                android:text=" | "
                 android:textAllCaps="false"
                 android:textColor="#0E0721"
-                android:textSize="42sp"
+                android:textSize="48sp"
+                app:layout_constraintBottom_toBottomOf="@+id/id_cur_max"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/id_real_feel_text" />
+                app:layout_constraintTop_toBottomOf="@+id/id_cur_data"
+                app:layout_constraintVertical_bias="0.0" />
+
+            <TextView
+                android:id="@+id/id_cur_min"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:backgroundTint="#54296A"
+                android:fontFamily="@font/amiko"
+                android:gravity="left"
+                android:text="18 °C"
+                android:textAllCaps="false"
+                android:textColor="#0E0721"
+                android:textSize="48sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toEndOf="@+id/id_slashone"
+                app:layout_constraintTop_toBottomOf="@+id/id_cur_data" />
+
+            <TextView
+                android:id="@+id/id_cur_day_sky"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="#54296A"
+                android:fontFamily="@font/amiko"
+                android:gravity="right"
+                android:text="Sunny"
+                android:textAllCaps="false"
+                android:textColor="#0E0721"
+                android:textSize="34sp"
+                app:layout_constraintEnd_toStartOf="@+id/textView5"
+                app:layout_constraintHorizontal_bias="1.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/id_cur_max" />
+
+            <TextView
+                android:id="@+id/textView5"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="#54296A"
+                android:fontFamily="@font/amiko"
+                android:gravity="center"
+                android:text=" | "
+                android:textAllCaps="false"
+                android:textColor="#0E0721"
+                android:textSize="34sp"
+                app:layout_constraintBottom_toTopOf="@+id/id_text_wind"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/id_slashone" />
+
+            <TextView
+                android:id="@+id/id_cur_night_sky"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="#54296A"
+                android:fontFamily="@font/amiko"
+                android:gravity="left"
+                android:text="Clear"
+                android:textAllCaps="false"
+                android:textColor="#0E0721"
+                android:textSize="34sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toEndOf="@+id/textView5"
+                app:layout_constraintTop_toBottomOf="@+id/id_cur_min" />
 
             <TextView
                 android:id="@+id/id_cur_air"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
                 android:backgroundTint="#54296A"
                 android:fontFamily="@font/amiko_semibold"
                 android:text="Good"
@@ -127,13 +180,14 @@
                 android:textColor="#0E0721"
                 android:textSize="24sp"
                 app:layout_constraintStart_toEndOf="@+id/id_text_air"
-                app:layout_constraintTop_toBottomOf="@+id/id_cur_rf_max_min" />
+                app:layout_constraintTop_toBottomOf="@+id/id_cur_day_sky" />
 
             <TextView
                 android:id="@+id/id_text_air"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="40dp"
+                android:layout_marginTop="3dp"
                 android:backgroundTint="#54296A"
                 android:fontFamily="@font/amiko_semibold"
                 android:text="Air: "
@@ -141,12 +195,13 @@
                 android:textColor="@color/white"
                 android:textSize="24sp"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/id_cur_rf_max_min" />
+                app:layout_constraintTop_toBottomOf="@+id/id_cur_day_sky" />
 
             <TextView
                 android:id="@+id/id_text_wind"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
                 android:backgroundTint="#54296A"
                 android:fontFamily="@font/amiko_semibold"
                 android:text="Wind: "
@@ -154,12 +209,13 @@
                 android:textColor="@color/white"
                 android:textSize="24sp"
                 app:layout_constraintEnd_toStartOf="@+id/id_cur_wind"
-                app:layout_constraintTop_toBottomOf="@+id/id_cur_rf_max_min" />
+                app:layout_constraintTop_toBottomOf="@+id/id_cur_day_sky" />
 
             <TextView
                 android:id="@+id/id_cur_wind"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
                 android:layout_marginEnd="25dp"
                 android:backgroundTint="#54296A"
                 android:fontFamily="@font/amiko_semibold"
@@ -168,7 +224,7 @@
                 android:textColor="#0E0721"
                 android:textSize="24sp"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/id_cur_rf_max_min" />
+                app:layout_constraintTop_toBottomOf="@+id/id_cur_day_sky" />
 
             <TextView
                 android:id="@+id/id_cur_sunrise"
