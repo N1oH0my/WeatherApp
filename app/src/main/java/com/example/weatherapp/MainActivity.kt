@@ -2,7 +2,7 @@ package com.example.weatherapp
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import com.example.weatherapp.fragment.MainFragment
+import com.example.weatherapp.Fragments.MainFragment
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

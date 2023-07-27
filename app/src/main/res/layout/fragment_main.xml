@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".fragment.MainFragment">
+    tools:context=".Fragments.MainFragment">
+
 
     <ImageView
         android:id="@+id/id_imageBGView"
@@ -39,16 +40,33 @@
             android:backgroundTint="#4D3C1B60">
 
             <TextView
+                android:id="@+id/id_cur_city_name"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:backgroundTint="#54296A"
+                android:fontFamily="@font/amiko_semibold"
+                android:gravity="center"
+                android:text="Voronezh"
+                android:textAllCaps="false"
+                android:textColor="#0E0721"
+                android:textSize="24sp"
+                app:layout_constraintBottom_toTopOf="@+id/id_cur_data"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
                 android:id="@+id/id_cur_data"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/aubrey"
+                android:layout_marginTop="50dp"
+                android:fontFamily="@font/amiko_semibold"
                 android:gravity="center"
                 android:hapticFeedbackEnabled="false"
                 android:text="27 july"
                 android:textAllCaps="false"
-                android:textColor="#0E0721"
-                android:textSize="34sp"
+                android:textColor="@color/white"
+                android:textSize="24sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -58,12 +76,12 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:backgroundTint="#54296A"
-                android:fontFamily="@font/aubrey"
+                android:fontFamily="@font/amiko"
                 android:gravity="center"
                 android:text="30 °C / 18 °C"
                 android:textAllCaps="false"
                 android:textColor="#0E0721"
-                android:textSize="60sp"
+                android:textSize="48sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/id_cur_data" />
@@ -73,12 +91,12 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:backgroundTint="#54296A"
-                android:fontFamily="@font/aubrey"
+                android:fontFamily="@font/amiko_semibold"
                 android:gravity="center"
-                android:text="real feel"
+                android:text="Real feel"
                 android:textAllCaps="false"
-                android:textColor="#0E0721"
-                android:textSize="34sp"
+                android:textColor="@color/white"
+                android:textSize="24sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/id_cur_max_min" />
@@ -88,41 +106,67 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:backgroundTint="#54296A"
-                android:fontFamily="@font/aubrey"
+                android:fontFamily="@font/amiko"
                 android:gravity="center"
                 android:text="35 °C / 18 °C"
                 android:textAllCaps="false"
                 android:textColor="#0E0721"
-                android:textSize="48sp"
+                android:textSize="42sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/id_real_feel_text" />
 
             <TextView
-                android:id="@+id/id_sur_air"
+                android:id="@+id/id_cur_air"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="#54296A"
+                android:fontFamily="@font/amiko_semibold"
+                android:text="Good"
+                android:textAllCaps="false"
+                android:textColor="#0E0721"
+                android:textSize="24sp"
+                app:layout_constraintStart_toEndOf="@+id/id_text_air"
+                app:layout_constraintTop_toBottomOf="@+id/id_cur_rf_max_min" />
+
+            <TextView
+                android:id="@+id/id_text_air"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="40dp"
                 android:backgroundTint="#54296A"
-                android:fontFamily="@font/aubrey"
-                android:text="Air: Good"
+                android:fontFamily="@font/amiko_semibold"
+                android:text="Air: "
                 android:textAllCaps="false"
-                android:textColor="#0E0721"
-                android:textSize="34sp"
+                android:textColor="@color/white"
+                android:textSize="24sp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/id_cur_rf_max_min" />
 
             <TextView
-                android:id="@+id/id_sur_wind"
+                android:id="@+id/id_text_wind"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="40dp"
                 android:backgroundTint="#54296A"
-                android:fontFamily="@font/aubrey"
-                android:text="Wind: 5 km/h"
+                android:fontFamily="@font/amiko_semibold"
+                android:text="Wind: "
+                android:textAllCaps="false"
+                android:textColor="@color/white"
+                android:textSize="24sp"
+                app:layout_constraintEnd_toStartOf="@+id/id_cur_wind"
+                app:layout_constraintTop_toBottomOf="@+id/id_cur_rf_max_min" />
+
+            <TextView
+                android:id="@+id/id_cur_wind"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="25dp"
+                android:backgroundTint="#54296A"
+                android:fontFamily="@font/amiko_semibold"
+                android:text="5 km/h"
                 android:textAllCaps="false"
                 android:textColor="#0E0721"
-                android:textSize="34sp"
+                android:textSize="24sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/id_cur_rf_max_min" />
 
@@ -130,41 +174,62 @@
                 android:id="@+id/id_cur_sunrise"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:layout_marginBottom="5dp"
                 android:backgroundTint="#54296A"
-                android:fontFamily="@font/aubrey"
-                android:text="Sunrise 4:38am"
+                android:fontFamily="@font/amiko_semibold"
+                android:text="4:38am"
                 android:textAllCaps="false"
                 android:textColor="#0E0721"
-                android:textSize="34sp"
-                app:layout_constraintBottom_toBottomOf="parent"
+                android:textSize="24sp"
+                app:layout_constraintStart_toEndOf="@+id/id_text_sunrise"
+                app:layout_constraintTop_toBottomOf="@+id/id_cur_air" />
+
+            <TextView
+                android:id="@+id/id_text_sunrise"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:backgroundTint="#54296A"
+                android:fontFamily="@font/amiko_semibold"
+                android:text="Sunrise: "
+                android:textAllCaps="false"
+                android:textColor="@color/white"
+                android:textSize="24sp"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/id_sur_air" />
+                app:layout_constraintTop_toBottomOf="@+id/id_text_air" />
+
+            <TextView
+                android:id="@+id/id_text_sunset"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:backgroundTint="#54296A"
+                android:fontFamily="@font/amiko_semibold"
+                android:text="Sunset: "
+                android:textAllCaps="false"
+                android:textColor="@color/white"
+                android:textSize="24sp"
+                app:layout_constraintEnd_toStartOf="@+id/id_cur_sunset"
+                app:layout_constraintTop_toBottomOf="@+id/id_text_wind" />
 
             <TextView
                 android:id="@+id/id_cur_sunset"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="10dp"
-                android:layout_marginBottom="5dp"
                 android:backgroundTint="#54296A"
-                android:fontFamily="@font/aubrey"
-                android:text="Sunset 8:00pm"
+                android:fontFamily="@font/amiko_semibold"
+                android:text="8:00pm"
                 android:textAllCaps="false"
                 android:textColor="#0E0721"
-                android:textSize="34sp"
-                app:layout_constraintBottom_toBottomOf="parent"
+                android:textSize="24sp"
                 app:layout_constraintEnd_toEndOf="parent"
-
-                app:layout_constraintTop_toBottomOf="@+id/id_sur_wind" />
+                app:layout_constraintTop_toBottomOf="@+id/id_cur_wind" />
 
             <ImageButton
                 android:id="@+id/id_search_btn"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:layout_marginTop="10dp"
+                android:layout_marginStart="3dp"
+                android:layout_marginTop="3dp"
                 android:background="@android:color/transparent"
                 android:contentDescription="@string/app_name"
 
@@ -202,6 +267,7 @@
     </com.google.android.material.tabs.TabLayout>
 
     <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/id_view_page"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginTop="3dp"
