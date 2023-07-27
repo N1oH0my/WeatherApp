@@ -21,57 +21,194 @@
         app:layout_constraintVertical_bias="0.0" />
 
     <androidx.cardview.widget.CardView
+        android:id="@+id/cardView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="5dp"
         android:layout_marginTop="5dp"
         android:layout_marginEnd="5dp"
+        app:cardBackgroundColor="@android:color/transparent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" >
+        app:layout_constraintTop_toTopOf="parent">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:background="#B53C1B60"
+            android:backgroundTint="#4D3C1B60">
 
             <TextView
                 android:id="@+id/id_cur_data"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="8dp"
+                android:fontFamily="@font/aubrey"
+                android:gravity="center"
+                android:hapticFeedbackEnabled="false"
                 android:text="27 july"
-                android:textSize="16sp"
+                android:textAllCaps="false"
+                android:textColor="#0E0721"
+                android:textSize="34sp"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
-                android:id="@+id/id_cur_max_temp"
-                android:layout_width="wrap_content"
+                android:id="@+id/id_cur_max_min"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="5dp"
-                android:layout_marginTop="40dp"
-                android:text="30 °C"
+                android:backgroundTint="#54296A"
+                android:fontFamily="@font/aubrey"
+                android:gravity="center"
+                android:text="30 °C / 18 °C"
+                android:textAllCaps="false"
+                android:textColor="#0E0721"
+                android:textSize="60sp"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toBottomOf="@+id/id_cur_data" />
 
             <TextView
-                android:id="@+id/id_slash"
-                android:layout_width="wrap_content"
+                android:id="@+id/id_real_feel_text"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="50dp"
-                android:layout_marginTop="40dp"
-                android:text="/"
+                android:backgroundTint="#54296A"
+                android:fontFamily="@font/aubrey"
+                android:gravity="center"
+                android:text="real feel"
+                android:textAllCaps="false"
+                android:textColor="#0E0721"
+                android:textSize="34sp"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toBottomOf="@+id/id_cur_max_min" />
 
             <TextView
-                android:id="@+id/id_cur_min_temp"
+                android:id="@+id/id_cur_rf_max_min"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="TextView"
+                android:backgroundTint="#54296A"
+                android:fontFamily="@font/aubrey"
+                android:gravity="center"
+                android:text="35 °C / 18 °C"
+                android:textAllCaps="false"
+                android:textColor="#0E0721"
+                android:textSize="48sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/id_real_feel_text" />
+
+            <TextView
+                android:id="@+id/id_sur_air"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="40dp"
+                android:backgroundTint="#54296A"
+                android:fontFamily="@font/aubrey"
+                android:text="Air: Good"
+                android:textAllCaps="false"
+                android:textColor="#0E0721"
+                android:textSize="34sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/id_cur_rf_max_min" />
+
+            <TextView
+                android:id="@+id/id_sur_wind"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="40dp"
+                android:backgroundTint="#54296A"
+                android:fontFamily="@font/aubrey"
+                android:text="Wind: 5 km/h"
+                android:textAllCaps="false"
+                android:textColor="#0E0721"
+                android:textSize="34sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/id_cur_rf_max_min" />
+
+            <TextView
+                android:id="@+id/id_cur_sunrise"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginBottom="5dp"
+                android:backgroundTint="#54296A"
+                android:fontFamily="@font/aubrey"
+                android:text="Sunrise 4:38am"
+                android:textAllCaps="false"
+                android:textColor="#0E0721"
+                android:textSize="34sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/id_sur_air" />
+
+            <TextView
+                android:id="@+id/id_cur_sunset"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="10dp"
+                android:layout_marginBottom="5dp"
+                android:backgroundTint="#54296A"
+                android:fontFamily="@font/aubrey"
+                android:text="Sunset 8:00pm"
+                android:textAllCaps="false"
+                android:textColor="#0E0721"
+                android:textSize="34sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+
+                app:layout_constraintTop_toBottomOf="@+id/id_sur_wind" />
+
+            <ImageButton
+                android:id="@+id/id_search_btn"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
+                android:background="@android:color/transparent"
+                android:contentDescription="@string/app_name"
+
+                android:src="@drawable/search_icon"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>
+
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/id_h_days_btn"
+        style="@style/TabLayoutStyle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="3dp"
+        android:background="#7F3C1B60"
+        android:backgroundTint="#7F3C1B60"
+        app:layout_constraintEnd_toEndOf="@+id/cardView"
+
+        app:layout_constraintStart_toStartOf="@+id/cardView"
+        app:layout_constraintTop_toBottomOf="@+id/cardView">
+
+        <com.google.android.material.tabs.TabItem
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Hours"
+            android:textColor="#FFFFFF" />
+
+        <com.google.android.material.tabs.TabItem
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Days"
+            android:textColor="#FFFFFF" />
+
+    </com.google.android.material.tabs.TabLayout>
+
+    <androidx.viewpager2.widget.ViewPager2
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="3dp"
+        android:layout_marginBottom="3dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/id_h_days_btn"
+        app:layout_constraintStart_toStartOf="@+id/id_h_days_btn"
+        app:layout_constraintTop_toBottomOf="@+id/id_h_days_btn"
+        app:layout_constraintVertical_bias="0.0" />
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="TabLayoutStyle" parent="Widget.Design.TabLayout">
+        <item name="tabTextColor">#FFFFFF</item>
+        <item name="android:fontFamily">@font/aubrey</item>
+        <item name="android:background">?attr/colorPrimary</item>
+        <item name="android:textColorPrimary">@android:color/white</item>
+    </style>
+</resources>
