@@ -22,9 +22,11 @@ import com.android.volley.toolbox.JsonArrayRequest
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
 import com.example.weatherapp.Adapters.ViewPageAdapter
+import com.example.weatherapp.DataModels.WeatherHoursModel
 import com.example.weatherapp.databinding.FragmentMainBinding
 import com.example.weatherapp.Fragments.HoursFragment
 import com.example.weatherapp.Fragments.DaysFragment
+import com.example.weatherapp.ViewModels.MainViewModel
 import com.google.android.material.tabs.TabLayoutMediator
 import org.json.JSONArray
 import org.json.JSONException
@@ -78,7 +80,7 @@ class MainFragment : Fragment() {
             }
         }
         */
-        //RequestWeather(requireContext(),"296543")
+        RequestWeather(requireContext(),"296543")
     }
     //----------------------Init------------------------------------------
     private fun Init() = with(binding)
@@ -133,19 +135,15 @@ class MainFragment : Fragment() {
 
         val jsonArrayRequest = JsonArrayRequest(Request.Method.GET, url, null,
             Response.Listener { response ->
-                val h0 = response.getJSONObject(0).toString()
-                val h1 = response.getJSONObject(1).toString()
-                val h2 = response.getJSONObject(2).toString()
-                val h3 = response.getJSONObject(3).toString()
-                val h4 = response.getJSONObject(4).toString()
-                val h5 = response.getJSONObject(5).toString()
-                val h6 = response.getJSONObject(6).toString()
-                val h7 = response.getJSONObject(7).toString()
-                val h8 = response.getJSONObject(8).toString()
-                val h9 = response.getJSONObject(9).toString()
-                val h10 = response.getJSONObject(10).toString()
-                val h11 = response.getJSONObject(11).toString()
-                Log.d("MyLog", "1:$h0\n2:$h1\n3:$h2\n4:$h3\n5:$h4\n6:$h5\n7:$h6\n8:$h7\n9:$h8\n10:$h9\n11:$h10\n12:$h11")
+
+                val jsonObjectList = mutableListOf<JSONObject>()
+                for (i in 0 until 12) {
+                    val jsonObject = response.getJSONObject(i)
+                    jsonObjectList.add(jsonObject)
+                }
+                Log.d("MyLog", "weather ok\n")
+
+                parseDataFromJsonObjects(jsonObjectList)
             },
             Response.ErrorListener { error ->
                 Log.d("MyLog", "weather error")
@@ -169,6 +167,39 @@ class MainFragment : Fragment() {
             })
 
         requestQueue.add(jsonArrayRequest)
+    }
+
+    fun parseDataFromJsonObjects(jsonObjects: List<JSONObject>) {
+        for (jsonObject in jsonObjects) {
+            var date_time:String = jsonObject.getString("DateTime") ?: "null"
+            val item = WeatherHoursModel(
+                _sky = jsonObject.getString("IconPhrase"),
+                _sky_img = "cloudy.png",
+                _temp = jsonObject.getJSONObject("Temperature").getString("Value"),
+                _hour = parseTimeString(date_time),
+            )
+            Log.d("MyLog", "My Item\n${item._sky} \n ${item._temp} \n ${item._hour}")
+        }
+    }
+    private fun parseTimeString(input: String): String {
+        val regex = Regex("T(\\d{2}):(\\d{2})")
+        val matchResult = regex.find(input)
+
+        var time: String = "null"
+
+        return matchResult?.let { result ->
+            val hour = result.groupValues[1].toInt()
+            val minute = result.groupValues[2].toInt()
+
+            time = if (hour > 12) {
+                val formattedHour = (hour - 12).toString().padStart(2, '0')
+                "$formattedHour:${result.groupValues[2]} pm"
+            } else {
+                "$hour:${result.groupValues[2]} am"
+            }
+
+            time
+        }?: time
     }
     //----------------------------------------------------------------
     companion object {
