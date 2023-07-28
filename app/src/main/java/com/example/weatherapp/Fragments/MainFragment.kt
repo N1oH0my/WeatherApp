@@ -1,37 +1,41 @@
 package com.example.weatherapp.Fragments
 
 import android.Manifest
+import android.R
 import android.content.Context
 import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import com.android.volley.Request
-import com.android.volley.RequestQueue
 import com.android.volley.Response
 import com.android.volley.toolbox.JsonArrayRequest
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
 import com.example.weatherapp.Adapters.ViewPageAdapter
+import com.example.weatherapp.DataModels.DayItem
 import com.example.weatherapp.DataModels.WeatherHoursModel
 import com.example.weatherapp.databinding.FragmentMainBinding
-import com.example.weatherapp.Fragments.HoursFragment
-import com.example.weatherapp.Fragments.DaysFragment
-import com.example.weatherapp.ViewModels.MainViewModel
+import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
-import org.json.JSONArray
-import org.json.JSONException
 import org.json.JSONObject
-
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.util.Locale
+import java.util.regex.Pattern
 
 
 class MainFragment : Fragment() {
@@ -57,6 +61,7 @@ class MainFragment : Fragment() {
         // Inflate the layout for this fragment
         return binding.root
     }
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         //---
@@ -80,7 +85,8 @@ class MainFragment : Fragment() {
             }
         }
         */
-        RequestWeather(requireContext(),"296543")
+        //HourlyRequestWeather(requireContext(),"296543")
+        DailyRequestWeather(requireContext(),"296543", "Voronezh")
     }
     //----------------------Init------------------------------------------
     private fun Init() = with(binding)
@@ -113,25 +119,43 @@ class MainFragment : Fragment() {
             p_launcher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
         }
     }
-    /*override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == 123) {
-            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // Разрешение предоставлено
-            } else {
-                // Разрешение не предоставлено
-            }
-        }
-    }*/
     //---------------------------API-------------------------------------
-    private fun RequestWeather(context: Context, locationKey: String) {
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun DailyRequestWeather(context: Context, locationKey: String, city_name: String) {
         val queue = Volley.newRequestQueue(context)
         val url =
-            "http://dataservice.accuweather.com/forecasts/v1/hourly/12hour/$locationKey?apikey=$WEATHER_API_KEY&language=en&details=true&metric=true"
+            "http://dataservice.accuweather.com/forecasts/v1/daily/5day/" +
+                    "$locationKey?" +
+                    "apikey=$WEATHER_API_KEY&" +
+                    "language=en&details=true&metric=true"
+
+        val jsonArrayRequest = JsonObjectRequest(Request.Method.GET, url, null,
+            Response.Listener { response ->
+
+                //val mainJsonObject = response.getJSONArray("")
+                val dailyForecastsArray = response.getJSONArray("DailyForecasts")
+                val jsonObjectList = mutableListOf<JSONObject>()
+                for (i in 0 until 5) {
+                    val jsonObject = dailyForecastsArray.getJSONObject(i)
+                    jsonObjectList.add(jsonObject)
+                }
+                Log.d("MyLog", "weather ok\n")
+
+                ParseDailyDataFromJsonObjects(jsonObjectList, city_name)
+            },
+            Response.ErrorListener { error ->
+                Log.d("MyLog", "weather error")
+            })
+
+        queue.add(jsonArrayRequest)
+    }
+    private fun HourlyRequestWeather(context: Context, locationKey: String) {
+        val queue = Volley.newRequestQueue(context)
+        val url =
+            "http://dataservice.accuweather.com/forecasts/v1/hourly/12hour/" +
+                    "$locationKey?" +
+                    "apikey=$WEATHER_API_KEY&" +
+                    "language=en&details=true&metric=true"
 
         val jsonArrayRequest = JsonArrayRequest(Request.Method.GET, url, null,
             Response.Listener { response ->
@@ -143,7 +167,7 @@ class MainFragment : Fragment() {
                 }
                 Log.d("MyLog", "weather ok\n")
 
-                parseDataFromJsonObjects(jsonObjectList)
+                ParseHourlyDataFromJsonObjects(jsonObjectList)
             },
             Response.ErrorListener { error ->
                 Log.d("MyLog", "weather error")
@@ -169,19 +193,50 @@ class MainFragment : Fragment() {
         requestQueue.add(jsonArrayRequest)
     }
 
-    fun parseDataFromJsonObjects(jsonObjects: List<JSONObject>) {
+    fun ParseHourlyDataFromJsonObjects(jsonObjects: List<JSONObject>) {
         for (jsonObject in jsonObjects) {
             var date_time:String = jsonObject.getString("DateTime") ?: "null"
             val item = WeatherHoursModel(
                 _sky = jsonObject.getString("IconPhrase"),
                 _sky_img = "cloudy.png",
                 _temp = jsonObject.getJSONObject("Temperature").getString("Value"),
-                _hour = parseTimeString(date_time),
+                _hour = ParseTimeString(date_time),
             )
             Log.d("MyLog", "My Item\n${item._sky} \n ${item._temp} \n ${item._hour}")
         }
     }
-    private fun parseTimeString(input: String): String {
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun ParseDailyDataFromJsonObjects(jsonObjects: List<JSONObject>, city_name: String) {
+        for (jsonObject in jsonObjects) {
+            var date_time:String = jsonObject.getString("Date") ?: "null"
+            var sunrise_time:String = jsonObject.getJSONObject("Sun").getString("Rise")
+            var sunset_time:String = jsonObject.getJSONObject("Sun").getString("Set")
+            val air_array = jsonObject.getJSONArray("AirAndPollen")
+            val item = DayItem(
+                _city = city_name,
+                _date = ParseDateString(date_time),
+                _max_temp = jsonObject.getJSONObject("Temperature")
+                    .getJSONObject("Maximum").getString("Value"),
+                _min_temp = jsonObject.getJSONObject("Temperature")
+                    .getJSONObject("Minimum").getString("Value"),
+                _sky_day = jsonObject.getJSONObject("Day").getString("IconPhrase"),
+                _sky_night = jsonObject.getJSONObject("Night").getString("IconPhrase"),
+                _air_quality = air_array.getJSONObject(0).getString("Category"),
+                _wind = jsonObject.getJSONObject("Day").getJSONObject("Wind")
+                    .getJSONObject("Speed").getString("Value") +
+                        jsonObject.getJSONObject("Day").getJSONObject("Wind")
+                            .getJSONObject("Speed").getString("Unit"),
+                _sunrise = ParseTimeString(sunrise_time),
+                _sunset = ParseTimeString(sunset_time),
+            )
+            Log.d("MyLog", "My Item\n${item._city} \n${item._date}" +
+                    "\n ${item._max_temp} \n ${item._min_temp}"+
+                    "\n ${item._sky_day} \n ${item._sky_night}"+
+                    "\n ${item._air_quality} \n ${item._wind}"+
+                    "\n ${item._sunrise} \n ${item._sunset}")
+        }
+    }
+    private fun ParseTimeString(input: String): String {
         val regex = Regex("T(\\d{2}):(\\d{2})")
         val matchResult = regex.find(input)
 
@@ -200,6 +255,16 @@ class MainFragment : Fragment() {
 
             time
         }?: time
+    }
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun ParseDateString(dateString: String): String {
+        val formatterIn = DateTimeFormatter.ISO_OFFSET_DATE_TIME
+        val formatterOut = DateTimeFormatter.ofPattern("d MMMM")
+
+        val dateTime = LocalDateTime.parse(dateString, formatterIn)
+        val formattedDate = dateTime.format(formatterOut)
+
+        return formattedDate
     }
     //----------------------------------------------------------------
     companion object {

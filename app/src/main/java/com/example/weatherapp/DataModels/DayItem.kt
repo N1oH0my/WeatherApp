@@ -1,10 +1,10 @@
 package com.example.weatherapp.DataModels
 
-data class CurDayItem(
-    val _location_key: String,
+data class DayItem(
+    //val _location_key: String,
 
     val _city: String,
-    val _data: String,
+    val _date: String,
 
     val _max_temp: String,
     val _min_temp: String,
@@ -18,5 +18,4 @@ data class CurDayItem(
     val _sunrise: String,
     val _sunset: String,
 
-    val _hours: String,
 )
