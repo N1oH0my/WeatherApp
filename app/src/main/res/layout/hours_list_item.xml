@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginStart="8dp"
+    android:layout_marginStart="3dp"
     android:background="@android:color/transparent"
     app:cardBackgroundColor="@android:color/transparent"
     app:cardCornerRadius="15dp"
@@ -79,8 +79,8 @@
 
         <ImageView
             android:id="@+id/id_h_sky_img"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
             android:layout_marginStart="10dp"
             android:contentDescription="@string/app_name"
             app:layout_constraintStart_toEndOf="@+id/id_h_sky"

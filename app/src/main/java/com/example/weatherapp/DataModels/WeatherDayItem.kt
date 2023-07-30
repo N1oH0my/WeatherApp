@@ -12,6 +12,9 @@ data class WeatherDayItem(
     val _sky_day: String,
     val _sky_night: String,
 
+    val _sky_day_img_url: String,
+    val _sky_night_img_url: String,
+
     val _air_quality: String,
     val _wind: String,
 

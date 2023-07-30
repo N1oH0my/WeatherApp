@@ -198,9 +198,16 @@ class MainFragment : Fragment() {
         var item_list: MutableList<WeatherHoursModel> = mutableListOf()
         for (jsonObject in jsonObjects) {
             var date_time:String = jsonObject.getString("DateTime") ?: "null"
+            var icon_code:String = jsonObject.getString("WeatherIcon")?: "null"
+            if (icon_code.length == 1)
+            {
+                icon_code = "0"+icon_code
+            }
             val item = WeatherHoursModel(
                 _sky = jsonObject.getString("IconPhrase"),
-                _sky_img = "cloudy.png",
+                _sky_img = "https://developer.accuweather.com/sites/default/files/"+
+                        icon_code +
+                "-s.png",
                 _temp = jsonObject.getJSONObject("Temperature").getString("Value") +" °C",
                 _hour = ParseTimeString(date_time),
             )
@@ -219,6 +226,14 @@ class MainFragment : Fragment() {
             var sunrise_time:String = jsonObject.getJSONObject("Sun").getString("Rise")
             var sunset_time:String = jsonObject.getJSONObject("Sun").getString("Set")
             val air_array = jsonObject.getJSONArray("AirAndPollen")
+
+            var icon_day_code = jsonObject.getJSONObject("Day").getString("Icon")?:"null"
+            var icon_night_code = jsonObject.getJSONObject("Night").getString("Icon")?:"null"
+            if (icon_day_code.length == 1)
+                icon_day_code = "0"+icon_day_code
+            if (icon_night_code.length == 1)
+                icon_night_code = "0"+icon_night_code
+
             val item = WeatherDayItem(
                 _city = city_name,
                 _date = ParseDateString(date_time),
@@ -228,6 +243,14 @@ class MainFragment : Fragment() {
                     .getJSONObject("Minimum").getString("Value")+" °C",
                 _sky_day = jsonObject.getJSONObject("Day").getString("IconPhrase"),
                 _sky_night = jsonObject.getJSONObject("Night").getString("IconPhrase"),
+
+                _sky_day_img_url = "https://developer.accuweather.com/sites/default/files/"+
+                        icon_day_code +
+                        "-s.png",
+                _sky_night_img_url = "https://developer.accuweather.com/sites/default/files/"+
+                        icon_night_code +
+                        "-s.png",
+
                 _air_quality = air_array.getJSONObject(0).getString("Category"),
                 _wind = jsonObject.getJSONObject("Day").getJSONObject("Wind")
                     .getJSONObject("Speed").getString("Value") +
