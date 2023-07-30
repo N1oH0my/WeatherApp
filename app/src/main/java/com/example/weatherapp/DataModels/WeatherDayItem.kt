@@ -1,6 +1,6 @@
 package com.example.weatherapp.DataModels
 
-data class DayItem(
+data class WeatherDayItem(
     //val _location_key: String,
 
     val _city: String,

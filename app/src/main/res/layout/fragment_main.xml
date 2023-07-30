@@ -28,6 +28,7 @@
         android:layout_marginStart="5dp"
         android:layout_marginTop="5dp"
         android:layout_marginEnd="5dp"
+        android:foregroundGravity="center|fill"
         app:cardBackgroundColor="@android:color/transparent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -56,7 +57,7 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
-                android:id="@+id/id_cur_data"
+                android:id="@+id/id_cur_date"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/amiko_semibold"
@@ -84,7 +85,7 @@
                 app:layout_constraintEnd_toStartOf="@+id/id_slashone"
                 app:layout_constraintHorizontal_bias="1.0"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/id_cur_data" />
+                app:layout_constraintTop_toBottomOf="@+id/id_cur_date" />
 
             <TextView
                 android:id="@+id/id_slashone"
@@ -100,7 +101,7 @@
                 app:layout_constraintBottom_toBottomOf="@+id/id_cur_max"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/id_cur_data"
+                app:layout_constraintTop_toBottomOf="@+id/id_cur_date"
                 app:layout_constraintVertical_bias="0.0" />
 
             <TextView
@@ -117,7 +118,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toEndOf="@+id/id_slashone"
-                app:layout_constraintTop_toBottomOf="@+id/id_cur_data" />
+                app:layout_constraintTop_toBottomOf="@+id/id_cur_date" />
 
             <TextView
                 android:id="@+id/id_cur_day_sky"
@@ -129,7 +130,7 @@
                 android:text="Sunny"
                 android:textAllCaps="false"
                 android:textColor="#0E0721"
-                android:textSize="34sp"
+                android:textSize="24sp"
                 app:layout_constraintEnd_toStartOf="@+id/textView5"
                 app:layout_constraintHorizontal_bias="1.0"
                 app:layout_constraintStart_toStartOf="parent"
@@ -161,7 +162,7 @@
                 android:text="Clear"
                 android:textAllCaps="false"
                 android:textColor="#0E0721"
-                android:textSize="34sp"
+                android:textSize="24sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toEndOf="@+id/textView5"
@@ -177,7 +178,7 @@
                 android:text="Good"
                 android:textAllCaps="false"
                 android:textColor="#0E0721"
-                android:textSize="24sp"
+                android:textSize="20sp"
                 app:layout_constraintStart_toEndOf="@+id/id_text_air"
                 app:layout_constraintTop_toBottomOf="@+id/id_cur_day_sky" />
 
@@ -192,7 +193,7 @@
                 android:text="Air: "
                 android:textAllCaps="false"
                 android:textColor="@color/white"
-                android:textSize="24sp"
+                android:textSize="20sp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/id_cur_day_sky" />
 
@@ -206,7 +207,7 @@
                 android:text="Wind: "
                 android:textAllCaps="false"
                 android:textColor="@color/white"
-                android:textSize="24sp"
+                android:textSize="20sp"
                 app:layout_constraintEnd_toStartOf="@+id/id_cur_wind"
                 app:layout_constraintTop_toBottomOf="@+id/id_cur_day_sky" />
 
@@ -221,7 +222,7 @@
                 android:text="5 km/h"
                 android:textAllCaps="false"
                 android:textColor="#0E0721"
-                android:textSize="24sp"
+                android:textSize="20sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/id_cur_day_sky" />
 
@@ -234,7 +235,7 @@
                 android:text="4:38am"
                 android:textAllCaps="false"
                 android:textColor="#0E0721"
-                android:textSize="24sp"
+                android:textSize="20sp"
                 app:layout_constraintStart_toEndOf="@+id/id_text_sunrise"
                 app:layout_constraintTop_toBottomOf="@+id/id_cur_air" />
 
@@ -248,7 +249,7 @@
                 android:text="Sunrise: "
                 android:textAllCaps="false"
                 android:textColor="@color/white"
-                android:textSize="24sp"
+                android:textSize="20sp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/id_text_air" />
 
@@ -261,7 +262,7 @@
                 android:text="Sunset: "
                 android:textAllCaps="false"
                 android:textColor="@color/white"
-                android:textSize="24sp"
+                android:textSize="20sp"
                 app:layout_constraintEnd_toStartOf="@+id/id_cur_sunset"
                 app:layout_constraintTop_toBottomOf="@+id/id_text_wind" />
 
@@ -275,7 +276,7 @@
                 android:text="8:00pm"
                 android:textAllCaps="false"
                 android:textColor="#0E0721"
-                android:textSize="24sp"
+                android:textSize="20sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/id_cur_wind" />
 
@@ -302,10 +303,12 @@
         android:layout_marginTop="3dp"
         android:background="#7F3C1B60"
         android:backgroundTint="#7F3C1B60"
-        app:layout_constraintEnd_toEndOf="@+id/cardView"
+        android:foregroundGravity="center|fill"
 
+        app:layout_constraintEnd_toEndOf="@+id/cardView"
         app:layout_constraintStart_toStartOf="@+id/cardView"
-        app:layout_constraintTop_toBottomOf="@+id/cardView">
+        app:layout_constraintTop_toBottomOf="@+id/cardView"
+        app:tabGravity="fill">
 
         <com.google.android.material.tabs.TabItem
             android:layout_width="wrap_content"
@@ -325,10 +328,14 @@
         android:id="@+id/id_view_page"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:layout_marginStart="3dp"
         android:layout_marginTop="3dp"
+        android:layout_marginEnd="3dp"
         android:layout_marginBottom="3dp"
+        android:foregroundGravity="top|center|fill"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/id_h_days_btn"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/id_h_days_btn"
         app:layout_constraintTop_toBottomOf="@+id/id_h_days_btn"
         app:layout_constraintVertical_bias="0.0" />

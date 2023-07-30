@@ -1,18 +1,15 @@
 package com.example.weatherapp.Fragments
 
 import android.Manifest
-import android.R
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
-import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
-import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -20,22 +17,21 @@ import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
+import androidx.fragment.app.activityViewModels
 import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.toolbox.JsonArrayRequest
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
 import com.example.weatherapp.Adapters.ViewPageAdapter
-import com.example.weatherapp.DataModels.DayItem
+import com.example.weatherapp.DataModels.WeatherDayItem
 import com.example.weatherapp.DataModels.WeatherHoursModel
+import com.example.weatherapp.ViewModels.MainViewModel
 import com.example.weatherapp.databinding.FragmentMainBinding
-import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import org.json.JSONObject
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
-import java.util.Locale
-import java.util.regex.Pattern
 
 
 class MainFragment : Fragment() {
@@ -43,6 +39,8 @@ class MainFragment : Fragment() {
     private val WEATHER_API_KEY: String = "ZhvnfeXeICWsbRy1Xy0hxUN2ajAtfLnV"
     private lateinit var binding: FragmentMainBinding
     private lateinit var p_launcher: ActivityResultLauncher<String>
+    //private val cur_data by activityViewModels<MainViewModel>()
+    private val cur_data: MainViewModel by activityViewModels()
 
     private var f_list = listOf(
         HoursFragment.newInstance(),
@@ -72,21 +70,24 @@ class MainFragment : Fragment() {
         PermissionChecker()
         Init()
 
-        /*
-        val cityName = "Paris"
+        UpdateCurrentData()
+        /**/
+        val cityName = "Voronezh"
         FindLocationKey(requireContext(), cityName) { locationKey ->
             if (locationKey != null) {
-                // Ключ расположения найден, выполняйте необходимые действия
                 Toast.makeText(activity, "Found u", Toast.LENGTH_SHORT).show()
-                RequestWeather(requireContext(),locationKey)
+
+                DailyRequestWeather(requireContext(),locationKey, cityName)
+                HourlyRequestWeather(requireContext(),locationKey)
+
             } else {
                 // Ключ расположения не найден или произошла ошибка,
                 Toast.makeText(activity, "Location not found :(", Toast.LENGTH_SHORT).show()
             }
         }
-        */
+
         //HourlyRequestWeather(requireContext(),"296543")
-        DailyRequestWeather(requireContext(),"296543", "Voronezh")
+        //DailyRequestWeather(requireContext(),"296543", "Voronezh")
     }
     //----------------------Init------------------------------------------
     private fun Init() = with(binding)
@@ -194,31 +195,37 @@ class MainFragment : Fragment() {
     }
 
     fun ParseHourlyDataFromJsonObjects(jsonObjects: List<JSONObject>) {
+        var item_list: MutableList<WeatherHoursModel> = mutableListOf()
         for (jsonObject in jsonObjects) {
             var date_time:String = jsonObject.getString("DateTime") ?: "null"
             val item = WeatherHoursModel(
                 _sky = jsonObject.getString("IconPhrase"),
                 _sky_img = "cloudy.png",
-                _temp = jsonObject.getJSONObject("Temperature").getString("Value"),
+                _temp = jsonObject.getJSONObject("Temperature").getString("Value") +" °C",
                 _hour = ParseTimeString(date_time),
             )
+            item_list.add(item)
+
             Log.d("MyLog", "My Item\n${item._sky} \n ${item._temp} \n ${item._hour}")
         }
+        cur_data.live_data_hours.value =(item_list)
     }
     @RequiresApi(Build.VERSION_CODES.O)
     fun ParseDailyDataFromJsonObjects(jsonObjects: List<JSONObject>, city_name: String) {
+        var item_list: MutableList<WeatherDayItem> = mutableListOf()
         for (jsonObject in jsonObjects) {
+
             var date_time:String = jsonObject.getString("Date") ?: "null"
             var sunrise_time:String = jsonObject.getJSONObject("Sun").getString("Rise")
             var sunset_time:String = jsonObject.getJSONObject("Sun").getString("Set")
             val air_array = jsonObject.getJSONArray("AirAndPollen")
-            val item = DayItem(
+            val item = WeatherDayItem(
                 _city = city_name,
                 _date = ParseDateString(date_time),
                 _max_temp = jsonObject.getJSONObject("Temperature")
-                    .getJSONObject("Maximum").getString("Value"),
+                    .getJSONObject("Maximum").getString("Value")+" °C",
                 _min_temp = jsonObject.getJSONObject("Temperature")
-                    .getJSONObject("Minimum").getString("Value"),
+                    .getJSONObject("Minimum").getString("Value")+" °C",
                 _sky_day = jsonObject.getJSONObject("Day").getString("IconPhrase"),
                 _sky_night = jsonObject.getJSONObject("Night").getString("IconPhrase"),
                 _air_quality = air_array.getJSONObject(0).getString("Category"),
@@ -229,12 +236,16 @@ class MainFragment : Fragment() {
                 _sunrise = ParseTimeString(sunrise_time),
                 _sunset = ParseTimeString(sunset_time),
             )
+            item_list.add(item)
             Log.d("MyLog", "My Item\n${item._city} \n${item._date}" +
                     "\n ${item._max_temp} \n ${item._min_temp}"+
                     "\n ${item._sky_day} \n ${item._sky_night}"+
                     "\n ${item._air_quality} \n ${item._wind}"+
                     "\n ${item._sunrise} \n ${item._sunset}")
         }
+        //cur_data.live_data_days.postValue(item_list)
+        cur_data.live_data_days.value = (item_list)
+        cur_data.live_data_main.value = item_list.get(0)
     }
     private fun ParseTimeString(input: String): String {
         val regex = Regex("T(\\d{2}):(\\d{2})")
@@ -265,6 +276,25 @@ class MainFragment : Fragment() {
         val formattedDate = dateTime.format(formatterOut)
 
         return formattedDate
+    }
+    //------------------------Update----------------------------------------
+    private fun UpdateCurrentData() = with(binding)
+    {
+        cur_data.live_data_main.observe(viewLifecycleOwner){
+            idCurCityName.text = it._city
+            idCurDate.text = it._date
+
+            idCurMax.text = it._max_temp
+            idCurMin.text = it._min_temp
+
+            idCurDaySky.text = it._sky_day
+            idCurNightSky.text = it._sky_night
+
+            idCurAir.text = it._air_quality
+            idCurWind.text = it._wind
+            idCurSunrise.text = it._sunrise
+            idCurSunset.text = it._sunset
+        }
     }
     //----------------------------------------------------------------
     companion object {
