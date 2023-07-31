@@ -17,6 +17,7 @@ data class WeatherDayItem(
 
     val _air_quality: String,
     val _wind: String,
+    val _wind_direction: String,
 
     val _sunrise: String,
     val _sunset: String,

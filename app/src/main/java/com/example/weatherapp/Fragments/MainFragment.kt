@@ -44,12 +44,15 @@ import org.json.JSONObject
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import android.provider.Settings
+import com.example.weatherapp.DataModels.WeatherNowModel
+import com.squareup.picasso.Picasso
+import kotlinx.coroutines.delay
 
 
 class MainFragment : Fragment() {
 
-    //private val WEATHER_API_KEY: String = "ZhvnfeXeICWsbRy1Xy0hxUN2ajAtfLnV"
-    private val WEATHER_API_KEY: String = "FPv7HgXJ8uHDgICrYKtJmwyj67bsf00G"
+    private val WEATHER_API_KEY: String = "ZhvnfeXeICWsbRy1Xy0hxUN2ajAtfLnV"
+    //private val WEATHER_API_KEY: String = "FPv7HgXJ8uHDgICrYKtJmwyj67bsf00G"
     private lateinit var binding: FragmentMainBinding
     private lateinit var p_launcher: ActivityResultLauncher<String>
     private lateinit var f_location_client: FusedLocationProviderClient
@@ -85,18 +88,20 @@ class MainFragment : Fragment() {
             WindowManager.LayoutParams.FLAG_FULLSCREEN,
             WindowManager.LayoutParams.FLAG_FULLSCREEN);
         //---
-        Init()
-        PermissionChecker()
-        //GetLocation()
-
-
         UpdateCurrentData()
-        /**/
-        //val cityName = "Paris"
-        //GetAllForecasts(cityName)
+        Init()
 
-        HourlyRequestWeather(requireContext(),"296543")
-        DailyRequestWeather(requireContext(),"296543", "Voronezh")
+        PermissionChecker()
+        //getLocation()
+
+
+
+        /**/
+        //val cityName = "Voronezh"
+        //GetAllForecasts(cityName)
+        //DailyRequestWeather(requireContext(),"296543", "Voronezh")
+        //HourlyRequestWeather(requireContext(),"296543")
+
     }
     //----------------------Init------------------------------------------
     @RequiresApi(Build.VERSION_CODES.O)
@@ -113,7 +118,11 @@ class MainFragment : Fragment() {
         }.attach()
 
         idSeeMoreDetails.setOnClickListener {
-            val url = "https://www.accuweather.com"///ru/search-locations?query=${cur_data.city}"
+            var url = "https://www.accuweather.com"///ru/search-locations?query=${cur_data.city}"
+            if (cur_data.main_two._mobile_link != "null")
+            {
+                url = cur_data.main_two._mobile_link!!
+            }
             val intent = Intent(Intent.ACTION_VIEW)
             intent.data = Uri.parse(url)
             startActivity(intent)
@@ -223,10 +232,10 @@ class MainFragment : Fragment() {
         val addressList: List<Address>? = geocoder.getFromLocation(latitude, longitude, 1)
 
         if (addressList?.isNotEmpty() == true) {
-            return addressList[0].locality ?: "null"
+            return addressList[0].locality ?: "000"
         }
 
-        return "null"
+        return "000"
     }
 
 
@@ -236,13 +245,22 @@ class MainFragment : Fragment() {
     {
         FindLocationKey(requireContext(), cur_city_name) { locationKey ->
             if (locationKey != null) {
-                Toast.makeText(activity, "Found u", Toast.LENGTH_SHORT).show()
+                Toast.makeText(activity, "Found $cur_city_name", Toast.LENGTH_SHORT).show()
 
                 DailyRequestWeather(requireContext(),locationKey, cur_city_name)
                 HourlyRequestWeather(requireContext(),locationKey)
 
+                Log.d("ML", "My Item MAIN1\n${cur_data.main_one._cur_sky} \n ${cur_data.main_one._cur_temp} \n ${cur_data.main_one._cur_sky_img_url}")
+                Log.d("ML", "MAIN2\n${cur_data.main_two._city} \n${cur_data.main_two._date}" +
+                        "\n ${cur_data.main_two._wind} \n ${cur_data.main_two._wind_direction}"+
+                        "\n ${cur_data.main_two._air_quality} \n "+
+                        "\n ${cur_data.main_two._sunrise} \n ${cur_data.main_two._sunset}")
+
+
             } else {
                 // Ключ расположения не найден или произошла ошибка,
+                val cityName = "Voronezh"
+                GetAllForecasts(cityName)
                 Toast.makeText(activity, "Sry,\n weather for ur city was not found,\n enter the nearest city", Toast.LENGTH_LONG).show()
 
             }
@@ -251,23 +269,33 @@ class MainFragment : Fragment() {
     @RequiresApi(Build.VERSION_CODES.O)
     private fun DailyRequestWeather(context: Context, locationKey: String, city_name: String) {
         val queue = Volley.newRequestQueue(context)
+        var language: String = "ru"
         val url =
             "http://dataservice.accuweather.com/forecasts/v1/daily/5day/" +
                     "$locationKey?" +
                     "apikey=$WEATHER_API_KEY&" +
-                    "language=en&details=true&metric=true"
+                    "language=$language&details=true&metric=true"
 
         val jsonArrayRequest = JsonObjectRequest(Request.Method.GET, url, null,
             Response.Listener { response ->
 
-                //val mainJsonObject = response.getJSONArray("")
+                //val headForecast = response.getJSONArray("Headline")
+                //cur_data.main_item._alert = headForecast.getJSONObject(0).getString("Text")?:" "
+                //cur_data.main_item._mobile_link = headForecast.getJSONObject(0).getString("MobileLink")?:" "
+                val headForecast = response.getJSONObject("Headline")
+                cur_data.main_two._alert = headForecast.getString("Text")?:" "
+                cur_data.main_two._mobile_link = headForecast.getString("MobileLink")?:" "
+
+                val check_alert = cur_data.main_two._alert
+                val check_link = cur_data.main_two._mobile_link
+                Log.d("ML", "CHeck $check_alert\n$check_link")
                 val dailyForecastsArray = response.getJSONArray("DailyForecasts")
                 val jsonObjectList = mutableListOf<JSONObject>()
                 for (i in 0 until 5) {
                     val jsonObject = dailyForecastsArray.getJSONObject(i)
                     jsonObjectList.add(jsonObject)
                 }
-                Log.d("MyLog", "weather ok\n")
+                Log.d("MyLog", "weather days ok\n")
 
                 ParseDailyDataFromJsonObjects(jsonObjectList, city_name)
             },
@@ -279,11 +307,12 @@ class MainFragment : Fragment() {
     }
     private fun HourlyRequestWeather(context: Context, locationKey: String) {
         val queue = Volley.newRequestQueue(context)
+        var language: String = "ru"
         val url =
             "http://dataservice.accuweather.com/forecasts/v1/hourly/12hour/" +
                     "$locationKey?" +
                     "apikey=$WEATHER_API_KEY&" +
-                    "language=en&details=true&metric=true"
+                    "language=$language&details=true&metric=true"
 
         val jsonArrayRequest = JsonArrayRequest(Request.Method.GET, url, null,
             Response.Listener { response ->
@@ -293,7 +322,7 @@ class MainFragment : Fragment() {
                     val jsonObject = response.getJSONObject(i)
                     jsonObjectList.add(jsonObject)
                 }
-                Log.d("MyLog", "weather ok\n")
+                Log.d("MyLog", "weather hours ok\n")
 
                 ParseHourlyDataFromJsonObjects(jsonObjectList)
             },
@@ -320,8 +349,11 @@ class MainFragment : Fragment() {
 
         requestQueue.add(jsonArrayRequest)
         */
-
-        val url = "http://dataservice.accuweather.com/locations/v1/cities/search?apikey=$WEATHER_API_KEY&q=$city&language=en&details=false&offset=1"
+        var language: String = "en"
+        val url = "http://dataservice.accuweather.com/locations/v1/cities/search?apikey=" +
+                "$WEATHER_API_KEY&q=" +
+                "$city" +
+                "&language=$language&details=false&offset=1"
 
         val requestQueue = Volley.newRequestQueue(context)
         val jsonArrayRequest = JsonArrayRequest(Request.Method.GET, url, null,
@@ -367,9 +399,15 @@ class MainFragment : Fragment() {
             )
             item_list.add(item)
 
-            Log.d("MyLog", "My Item\n${item._sky} \n ${item._temp} \n ${item._hour}")
+            Log.d("MyLog", "My H Item\n${item._sky} \n ${item._temp} \n ${item._hour}")
         }
+        cur_data.main_one._cur_temp = item_list[0]._temp
+        cur_data.main_one._cur_sky = item_list[0]._sky
+        cur_data.main_one._cur_sky_img_url = item_list[0]._sky_img
+        Log.d("ML", "My H Item MAIN\n${cur_data.main_one._cur_sky} \n ${cur_data.main_one._cur_temp} \n ${cur_data.main_one._cur_sky_img_url}")
+
         cur_data.live_data_hours.value =(item_list)
+        cur_data.live_data_main_one.value = cur_data.main_one
     }
     @RequiresApi(Build.VERSION_CODES.O)
     fun ParseDailyDataFromJsonObjects(jsonObjects: List<JSONObject>, city_name: String) {
@@ -377,8 +415,8 @@ class MainFragment : Fragment() {
         for (jsonObject in jsonObjects) {
 
             var date_time:String = jsonObject.getString("Date") ?: "null"
-            var sunrise_time:String = jsonObject.getJSONObject("Sun").getString("Rise")
-            var sunset_time:String = jsonObject.getJSONObject("Sun").getString("Set")
+            var sunrise_time:String = jsonObject.getJSONObject("Sun").getString("Rise")?: "null"
+            var sunset_time:String = jsonObject.getJSONObject("Sun").getString("Set")?: "null"
             val air_array = jsonObject.getJSONArray("AirAndPollen")
 
             var icon_day_code = jsonObject.getJSONObject("Day").getString("Icon")?:"null"
@@ -410,6 +448,8 @@ class MainFragment : Fragment() {
                     .getJSONObject("Speed").getString("Value") +
                         jsonObject.getJSONObject("Day").getJSONObject("Wind")
                             .getJSONObject("Speed").getString("Unit"),
+                _wind_direction = jsonObject.getJSONObject("Day").getJSONObject("Wind")
+                    .getJSONObject("Direction").getString("Localized"),
                 _sunrise = ParseTimeString(sunrise_time),
                 _sunset = ParseTimeString(sunset_time),
             )
@@ -421,9 +461,22 @@ class MainFragment : Fragment() {
                     "\n ${item._sunrise} \n ${item._sunset}")
         }
         //cur_data.live_data_days.postValue(item_list)
-        cur_data.city = city_name
+        cur_data.main_two._city = item_list[0]._city
+        cur_data.main_two._date = item_list[0]._date
+
+        cur_data.main_two._wind = item_list[0]._wind
+        cur_data.main_two._wind_direction = item_list[0]._wind_direction
+        cur_data.main_two._air_quality = item_list[0]._air_quality
+
+        cur_data.main_two._sunrise = item_list[0]._sunrise
+        cur_data.main_two._sunset = item_list[0]._sunset
+        Log.d("ML", "My D Item MAIN\n${cur_data.main_two._city} \n${cur_data.main_two._date}" +
+                "\n ${cur_data.main_two._wind} \n ${cur_data.main_two._wind_direction}"+
+                "\n ${cur_data.main_two._air_quality} \n "+
+                "\n ${cur_data.main_two._sunrise} \n ${cur_data.main_two._sunset}")
+
         cur_data.live_data_days.value = (item_list)
-        cur_data.live_data_main.value = item_list.get(0)
+        cur_data.live_data_main_two.value = cur_data.main_two
     }
     private fun ParseTimeString(input: String): String {
         val regex = Regex("T(\\d{2}):(\\d{2})")
@@ -462,7 +515,7 @@ class MainFragment : Fragment() {
         if (isLocationEnabled()) {
             getLocation()
         } else {
-            getLocation()
+            //getLocation()
             DialogManager.LocationSettingsDialog(requireContext (), object : DialogManager.Listener{
                 override fun onClick(city_name: String?) {
                     startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
@@ -479,20 +532,21 @@ class MainFragment : Fragment() {
     //------------------------Update----------------------------------------
     private fun UpdateCurrentData() = with(binding)
     {
-        cur_data.live_data_main.observe(viewLifecycleOwner){
+        cur_data.live_data_main_one.observe(viewLifecycleOwner){
+            idCurTemp.text = it._cur_temp
+
+            idCurSky.text = it._cur_sky
+            Picasso.get().load(it._cur_sky_img_url).into(idCurSkyMainImg)
+        }
+        cur_data.live_data_main_two.observe(viewLifecycleOwner){
             idCurCityName.text = it._city
             idCurDate.text = it._date
 
-            idCurMax.text = it._max_temp
-            idCurMin.text = it._min_temp
-
-            idCurDaySky.text = it._sky_day
-            idCurNightSky.text = it._sky_night
-
             idCurAir.text = it._air_quality
-            idCurWind.text = it._wind
+            idCurWind.text = it._wind + " " + it._wind_direction
             idCurSunrise.text = it._sunrise
             idCurSunset.text = it._sunset
+            idAlert.text = it._alert
         }
     }
     //----------------------------------------------------------------

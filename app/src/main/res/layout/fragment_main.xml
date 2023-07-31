@@ -36,7 +36,7 @@
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:background="#B53C1B60"
             android:backgroundTint="#4D3C1B60">
 
@@ -72,9 +72,10 @@
                 app:layout_constraintTop_toBottomOf="@+id/id_cur_city_name" />
 
             <TextView
-                android:id="@+id/id_cur_max"
-                android:layout_width="0dp"
+                android:id="@+id/id_cur_temp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginEnd="10dp"
                 android:backgroundTint="#54296A"
                 android:fontFamily="@font/amiko_semibold"
                 android:gravity="right"
@@ -82,97 +83,32 @@
                 android:textAllCaps="false"
                 android:textColor="#0E0721"
                 android:textSize="48sp"
-                app:layout_constraintEnd_toStartOf="@+id/id_slashone"
+                app:layout_constraintEnd_toStartOf="@+id/id_cur_sky_main_img"
                 app:layout_constraintHorizontal_bias="1.0"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/id_cur_date" />
 
             <TextView
-                android:id="@+id/id_slashone"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:backgroundTint="#54296A"
-                android:fontFamily="@font/amiko"
-                android:gravity="center"
-                android:text=" | "
-                android:textAllCaps="false"
-                android:textColor="#0E0721"
-                android:textSize="48sp"
-                app:layout_constraintBottom_toBottomOf="@+id/id_cur_max"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/id_cur_date"
-                app:layout_constraintVertical_bias="0.0" />
-
-            <TextView
-                android:id="@+id/id_cur_min"
+                android:id="@+id/id_cur_sky"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:backgroundTint="#54296A"
                 android:fontFamily="@font/amiko_semibold"
-                android:gravity="left"
-                android:text="18 °C"
-                android:textAllCaps="false"
-                android:textColor="#0E0721"
-                android:textSize="48sp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.0"
-                app:layout_constraintStart_toEndOf="@+id/id_slashone"
-                app:layout_constraintTop_toBottomOf="@+id/id_cur_date" />
-
-            <TextView
-                android:id="@+id/id_cur_day_sky"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:backgroundTint="#54296A"
-                android:fontFamily="@font/amiko_semibold"
-                android:gravity="right"
+                android:gravity="center"
                 android:text="Sunny"
                 android:textAllCaps="false"
                 android:textColor="#0E0721"
                 android:textSize="24sp"
-                app:layout_constraintEnd_toStartOf="@+id/textView5"
-                app:layout_constraintHorizontal_bias="1.0"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/id_cur_max" />
-
-            <TextView
-                android:id="@+id/textView5"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:backgroundTint="#54296A"
-                android:fontFamily="@font/amiko"
-                android:gravity="center"
-                android:text=" | "
-                android:textAllCaps="false"
-                android:textColor="#0E0721"
-                android:textSize="48sp"
-                app:layout_constraintBottom_toTopOf="@+id/id_text_wind"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/id_slashone" />
-
-            <TextView
-                android:id="@+id/id_cur_night_sky"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:backgroundTint="#54296A"
-                android:fontFamily="@font/amiko_semibold"
-                android:gravity="left"
-                android:text="Clear"
-                android:textAllCaps="false"
-                android:textColor="#0E0721"
-                android:textSize="24sp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.0"
-                app:layout_constraintStart_toEndOf="@+id/textView5"
-                app:layout_constraintTop_toBottomOf="@+id/id_cur_min" />
+                app:layout_constraintTop_toBottomOf="@+id/id_cur_temp" />
 
             <TextView
                 android:id="@+id/id_cur_air"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="3dp"
+                android:layout_marginStart="1dp"
+                android:layout_marginTop="8dp"
                 android:backgroundTint="#54296A"
                 android:fontFamily="@font/amiko_semibold"
                 android:text="Good"
@@ -180,14 +116,14 @@
                 android:textColor="#0E0721"
                 android:textSize="20sp"
                 app:layout_constraintStart_toEndOf="@+id/id_text_air"
-                app:layout_constraintTop_toBottomOf="@+id/id_cur_day_sky" />
+                app:layout_constraintTop_toBottomOf="@+id/id_cur_sky" />
 
             <TextView
                 android:id="@+id/id_text_air"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="40dp"
-                android:layout_marginTop="3dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="8dp"
                 android:backgroundTint="#54296A"
                 android:fontFamily="@font/amiko_semibold"
                 android:text="Air: "
@@ -195,13 +131,14 @@
                 android:textColor="@color/white"
                 android:textSize="20sp"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/id_cur_day_sky" />
+                app:layout_constraintTop_toBottomOf="@+id/id_cur_sky" />
 
             <TextView
                 android:id="@+id/id_text_wind"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="3dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="1dp"
                 android:backgroundTint="#54296A"
                 android:fontFamily="@font/amiko_semibold"
                 android:text="Wind: "
@@ -209,27 +146,28 @@
                 android:textColor="@color/white"
                 android:textSize="20sp"
                 app:layout_constraintEnd_toStartOf="@+id/id_cur_wind"
-                app:layout_constraintTop_toBottomOf="@+id/id_cur_day_sky" />
+                app:layout_constraintTop_toBottomOf="@+id/id_cur_sky" />
 
             <TextView
                 android:id="@+id/id_cur_wind"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="3dp"
-                android:layout_marginEnd="25dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="10dp"
                 android:backgroundTint="#54296A"
                 android:fontFamily="@font/amiko_semibold"
-                android:text="5 km/h"
+                android:text="5 km/h ЮЮЗ"
                 android:textAllCaps="false"
                 android:textColor="#0E0721"
                 android:textSize="20sp"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/id_cur_day_sky" />
+                app:layout_constraintTop_toBottomOf="@+id/id_cur_sky" />
 
             <TextView
                 android:id="@+id/id_cur_sunrise"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
                 android:backgroundTint="#54296A"
                 android:fontFamily="@font/amiko_semibold"
                 android:text="4:38am"
@@ -257,6 +195,7 @@
                 android:id="@+id/id_text_sunset"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_marginEnd="5dp"
                 android:backgroundTint="#54296A"
                 android:fontFamily="@font/amiko_semibold"
                 android:text="Sunset: "
@@ -284,8 +223,8 @@
                 android:id="@+id/id_search_btn"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="3dp"
-                android:layout_marginTop="3dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
                 android:background="@android:color/transparent"
                 android:contentDescription="@string/app_name"
 
@@ -297,12 +236,45 @@
                 android:id="@+id/id_location_btn"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="3dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
                 android:background="@android:color/transparent"
                 android:contentDescription="@string/app_name"
                 android:src="@drawable/location_icon"
                 app:layout_constraintEnd_toEndOf="@+id/id_cur_city_name"
                 app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageView
+                android:id="@+id/id_cur_sky_main_img"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:src="@drawable/weatherapp_icon"
+                app:layout_constraintBottom_toTopOf="@+id/id_cur_sky"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.8"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/id_cur_date" />
+
+            <TextView
+                android:id="@+id/id_alert"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="10dp"
+                android:layout_marginBottom="10dp"
+                android:backgroundTint="#54296A"
+                android:fontFamily="@font/amiko_semibold"
+                android:gravity="center"
+                android:text="Alert"
+                android:textAllCaps="false"
+                android:textColor="#0E0721"
+                android:textSize="20sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/id_text_sunrise" />
+
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>
 
@@ -311,7 +283,7 @@
         style="@style/TabLayoutStyle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="3dp"
+        android:layout_marginTop="5dp"
         android:background="#7F3C1B60"
         android:backgroundTint="#7F3C1B60"
         android:foregroundGravity="center|fill"
@@ -346,7 +318,6 @@
         android:foregroundGravity="top|center|fill"
         app:layout_constraintBottom_toTopOf="@+id/id_see_more_details"
         app:layout_constraintEnd_toEndOf="@+id/id_h_days_btn"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/id_h_days_btn"
         app:layout_constraintTop_toBottomOf="@+id/id_h_days_btn"
         app:layout_constraintVertical_bias="0.0" />

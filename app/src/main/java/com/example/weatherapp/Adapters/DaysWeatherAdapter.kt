@@ -19,6 +19,7 @@ class DaysWeatherAdapter: ListAdapter<WeatherDayItem, DaysWeatherAdapter.Holder>
             idDDate.text = item._date
             idDTempMax.text = item._max_temp
             idDTempMin.text = item._min_temp
+            idDWind.text = (item._wind+" "+item._wind_direction)
 
             Picasso.get().load(item._sky_day_img_url).into(idDDaySkyImg)
             Picasso.get().load(item._sky_night_img_url).into(idDNightSkyImg)
