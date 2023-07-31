@@ -48,7 +48,8 @@ import android.provider.Settings
 
 class MainFragment : Fragment() {
 
-    private val WEATHER_API_KEY: String = "ZhvnfeXeICWsbRy1Xy0hxUN2ajAtfLnV"
+    //private val WEATHER_API_KEY: String = "ZhvnfeXeICWsbRy1Xy0hxUN2ajAtfLnV"
+    private val WEATHER_API_KEY: String = "FPv7HgXJ8uHDgICrYKtJmwyj67bsf00G"
     private lateinit var binding: FragmentMainBinding
     private lateinit var p_launcher: ActivityResultLauncher<String>
     private lateinit var f_location_client: FusedLocationProviderClient
