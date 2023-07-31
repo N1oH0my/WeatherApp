@@ -3,6 +3,9 @@ package com.example.weatherapp.Fragments
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
+import android.location.Address
+import android.location.Geocoder
+import android.location.Location
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -14,6 +17,7 @@ import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
@@ -28,7 +32,10 @@ import com.example.weatherapp.DataModels.WeatherDayItem
 import com.example.weatherapp.DataModels.WeatherHoursModel
 import com.example.weatherapp.ViewModels.MainViewModel
 import com.example.weatherapp.databinding.FragmentMainBinding
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import com.google.android.material.tabs.TabLayoutMediator
+import org.json.JSONException
 import org.json.JSONObject
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -39,7 +46,8 @@ class MainFragment : Fragment() {
     private val WEATHER_API_KEY: String = "ZhvnfeXeICWsbRy1Xy0hxUN2ajAtfLnV"
     private lateinit var binding: FragmentMainBinding
     private lateinit var p_launcher: ActivityResultLauncher<String>
-    //private val cur_data by activityViewModels<MainViewModel>()
+    private lateinit var f_location_client: FusedLocationProviderClient
+
     private val cur_data: MainViewModel by activityViewModels()
 
     private var f_list = listOf(
@@ -49,6 +57,10 @@ class MainFragment : Fragment() {
     private val hd_title_list = listOf(
         "Hourly",
         "Daily",
+    )
+    private val locationPermission = arrayOf(
+        Manifest.permission.ACCESS_FINE_LOCATION,
+        Manifest.permission.ACCESS_COARSE_LOCATION
     )
     //-----------------------Start-----------------------------------------
     override fun onCreateView(
@@ -67,31 +79,24 @@ class MainFragment : Fragment() {
             WindowManager.LayoutParams.FLAG_FULLSCREEN,
             WindowManager.LayoutParams.FLAG_FULLSCREEN);
         //---
-        PermissionChecker()
         Init()
+        PermissionChecker()
+        //GetLocation()
+
 
         UpdateCurrentData()
         /**/
-        val cityName = "Voronezh"
-        FindLocationKey(requireContext(), cityName) { locationKey ->
-            if (locationKey != null) {
-                Toast.makeText(activity, "Found u", Toast.LENGTH_SHORT).show()
-
-                DailyRequestWeather(requireContext(),locationKey, cityName)
-                HourlyRequestWeather(requireContext(),locationKey)
-
-            } else {
-                // Ключ расположения не найден или произошла ошибка,
-                Toast.makeText(activity, "Location not found :(", Toast.LENGTH_SHORT).show()
-            }
-        }
+        //val cityName = "Paris"
+        //GetAllForecasts(cityName)
 
         //HourlyRequestWeather(requireContext(),"296543")
         //DailyRequestWeather(requireContext(),"296543", "Voronezh")
     }
     //----------------------Init------------------------------------------
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun Init() = with(binding)
     {
+        f_location_client = LocationServices.getFusedLocationProviderClient(requireContext())
         val adapter = ViewPageAdapter(activity as FragmentActivity, f_list)
 
         idViewPage.adapter = adapter
@@ -100,27 +105,112 @@ class MainFragment : Fragment() {
         {
             tab, pos -> tab.text = hd_title_list[pos]
         }.attach()
+
+        idLocationBtn.setOnClickListener {
+            getLocation()
+        }
     }
     //----------------------Permissions------------------------------------------
-    private fun PermissionListner()
-    {
-        p_launcher =
-            registerForActivityResult(ActivityResultContracts.RequestPermission())
-        {
-           Toast.makeText(activity, "permission is $it", Toast.LENGTH_SHORT).show()
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun PermissionListener() {
+        val permissionLauncher = registerForActivityResult(
+            ActivityResultContracts.RequestMultiplePermissions()
+        ) { permissions ->
+            if (permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true &&
+                permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true
+            ) {
+                Toast.makeText(requireContext(), "Location permission granted", Toast.LENGTH_SHORT).show()
+                getLocation()
+            } else {
+                Toast.makeText(requireContext(), "Location permission denied", Toast.LENGTH_SHORT).show()
+                // Обработка случая, когда разрешение на местоположение отклонено
+            }
+        }
+        permissionLauncher.launch(locationPermission)
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun PermissionChecker() {
+        if (!hasLocationPermissions()) {
+            PermissionListener()
+        } else {
+            getLocation()
         }
     }
-    private fun PermissionChecker() {
-        if (ContextCompat.checkSelfPermission(
+
+    @RequiresApi(Build.VERSION_CODES.M)
+    private fun hasLocationPermissions(): Boolean {
+        return locationPermission.all {
+            ContextCompat.checkSelfPermission(requireContext(), it) == PackageManager.PERMISSION_GRANTED
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun getLocation() {
+        if (!hasLocationPermissions()) {
+            // Разрешения на местоположение не предоставлены
+            return
+        }
+
+        if (ActivityCompat.checkSelfPermission(
                 requireContext(),
                 Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.ACCESS_COARSE_LOCATION
             ) != PackageManager.PERMISSION_GRANTED
         ) {
-            PermissionListner()
-            p_launcher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+            return
+        }
+        f_location_client.lastLocation
+            .addOnSuccessListener { location: Location? ->
+                if (location != null) {
+                    val cityName = getCityName(location.latitude, location.longitude)
+                    Toast.makeText(requireContext(), "Your city is $cityName", Toast.LENGTH_SHORT).show()
+                    GetAllForecasts(cityName)
+                } else {
+                    Toast.makeText(requireContext(), "Location is null", Toast.LENGTH_SHORT).show()
+                }
+            }
+            .addOnFailureListener { exception: Exception ->
+                Toast.makeText(
+                    requireContext(),
+                    "Failed to get location: ${exception.message}",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+    }
+
+    private fun getCityName(latitude: Double, longitude: Double): String {
+        val geocoder = Geocoder(requireContext())
+        val addressList: List<Address>? = geocoder.getFromLocation(latitude, longitude, 1)
+
+        if (addressList?.isNotEmpty() == true) {
+            return addressList[0].locality ?: "null"
+        }
+
+        return "null"
+    }
+
+
+    //---------------------------API-------------------------------------
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun GetAllForecasts(cur_city_name: String)
+    {
+        FindLocationKey(requireContext(), cur_city_name) { locationKey ->
+            if (locationKey != null) {
+                Toast.makeText(activity, "Found u", Toast.LENGTH_SHORT).show()
+
+                DailyRequestWeather(requireContext(),locationKey, cur_city_name)
+                HourlyRequestWeather(requireContext(),locationKey)
+
+            } else {
+                // Ключ расположения не найден или произошла ошибка,
+                Toast.makeText(activity, "Sry,\n weather for ur city was not found,\n enter the nearest city", Toast.LENGTH_LONG).show()
+
+            }
         }
     }
-    //---------------------------API-------------------------------------
     @RequiresApi(Build.VERSION_CODES.O)
     private fun DailyRequestWeather(context: Context, locationKey: String, city_name: String) {
         val queue = Volley.newRequestQueue(context)
@@ -177,7 +267,7 @@ class MainFragment : Fragment() {
         queue.add(jsonArrayRequest)
     }
     private fun FindLocationKey(context: Context, city: String, callback: (String?) -> Unit) {
-        val url = "http://dataservice.accuweather.com/locations/v1/cities/search?apikey=$WEATHER_API_KEY&q=$city&language=en&details=false&offset=1"
+        /*val url = "http://dataservice.accuweather.com/locations/v1/cities/search?apikey=$WEATHER_API_KEY&q=$city&language=en&details=false&offset=1"
 
         val requestQueue = Volley.newRequestQueue(context)
         val jsonArrayRequest = JsonArrayRequest(Request.Method.GET, url, null,
@@ -188,6 +278,33 @@ class MainFragment : Fragment() {
             },
             Response.ErrorListener { error ->
                 Log.d("MyLog", "lc error")
+                callback(null)
+            })
+
+        requestQueue.add(jsonArrayRequest)
+        */
+
+        val url = "http://dataservice.accuweather.com/locations/v1/cities/search?apikey=$WEATHER_API_KEY&q=$city&language=en&details=false&offset=1"
+
+        val requestQueue = Volley.newRequestQueue(context)
+        val jsonArrayRequest = JsonArrayRequest(Request.Method.GET, url, null,
+            Response.Listener { response ->
+                try {
+                    if (response.length() > 0) {
+                        val locationKey = response.getJSONObject(0).getString("Key")
+                        Log.d("MyLog", "location key: $locationKey \n")
+                        callback(locationKey)
+                    } else {
+                        Log.d("MyLog", "Response is empty")
+                        callback(null)
+                    }
+                } catch (e: JSONException) {
+                    Log.e("MyLog", "Error parsing JSON response: ${e.message}")
+                    callback(null)
+                }
+            },
+            Response.ErrorListener { error ->
+                Log.e("MyLog", "Volley request error: ${error.message}")
                 callback(null)
             })
 
