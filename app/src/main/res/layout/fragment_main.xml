@@ -344,7 +344,7 @@
         android:layout_marginEnd="3dp"
         android:layout_marginBottom="10dp"
         android:foregroundGravity="top|center|fill"
-        app:layout_constraintBottom_toTopOf="@+id/textView2"
+        app:layout_constraintBottom_toTopOf="@+id/id_see_more_details"
         app:layout_constraintEnd_toEndOf="@+id/id_h_days_btn"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/id_h_days_btn"
@@ -352,7 +352,7 @@
         app:layout_constraintVertical_bias="0.0" />
 
     <TextView
-        android:id="@+id/textView"
+        android:id="@+id/id_support"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
@@ -363,7 +363,7 @@
         app:layout_constraintStart_toStartOf="@+id/id_view_page" />
 
     <TextView
-        android:id="@+id/textView2"
+        android:id="@+id/id_see_more_details"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="10dp"
@@ -372,7 +372,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/textView3"
         app:layout_constraintHorizontal_bias="0.55"
-        app:layout_constraintStart_toEndOf="@+id/textView" />
+        app:layout_constraintStart_toEndOf="@+id/id_support" />
 
     <TextView
         android:id="@+id/textView3"
@@ -384,4 +384,5 @@
         android:textColor="#990E0721"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/id_view_page" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

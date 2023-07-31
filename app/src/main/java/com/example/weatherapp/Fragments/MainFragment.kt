@@ -1,6 +1,7 @@
 package com.example.weatherapp.Fragments
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -8,6 +9,7 @@ import android.location.Address
 import android.location.Geocoder
 import android.location.Location
 import android.location.LocationManager
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -92,8 +94,8 @@ class MainFragment : Fragment() {
         //val cityName = "Paris"
         //GetAllForecasts(cityName)
 
-        //HourlyRequestWeather(requireContext(),"296543")
-        //DailyRequestWeather(requireContext(),"296543", "Voronezh")
+        HourlyRequestWeather(requireContext(),"296543")
+        DailyRequestWeather(requireContext(),"296543", "Voronezh")
     }
     //----------------------Init------------------------------------------
     @RequiresApi(Build.VERSION_CODES.O)
@@ -109,15 +111,40 @@ class MainFragment : Fragment() {
             tab, pos -> tab.text = hd_title_list[pos]
         }.attach()
 
+        idSeeMoreDetails.setOnClickListener {
+            val url = "https://www.accuweather.com"///ru/search-locations?query=${cur_data.city}"
+            val intent = Intent(Intent.ACTION_VIEW)
+            intent.data = Uri.parse(url)
+            startActivity(intent)
+        }
+        idSupport.setOnClickListener{
+            val url = "https://t.me/niohomy"
+            val intent = Intent(Intent.ACTION_VIEW)
+            intent.data = Uri.parse(url)
+            startActivity(intent)
+        }
+
         idLocationBtn.setOnClickListener {
             checkLocation()
         }
+        idSearchBtn.setOnClickListener {
+            DialogManager.FindByNameDialog(requireContext(), object: DialogManager.Listener{
+                override fun onClick(city_name: String?) {
+                    Log.d("MyLog", "$city_name")
+                    if (city_name != null) {
+                        GetAllForecasts(city_name)
+                    }
+                }
+
+            })
+        }
+
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onResume() {
         super.onResume()
-        checkLocation()
+        //checkLocation()
     }
     //----------------------Permissions------------------------------------------
     @RequiresApi(Build.VERSION_CODES.O)
@@ -393,6 +420,7 @@ class MainFragment : Fragment() {
                     "\n ${item._sunrise} \n ${item._sunset}")
         }
         //cur_data.live_data_days.postValue(item_list)
+        cur_data.city = city_name
         cur_data.live_data_days.value = (item_list)
         cur_data.live_data_main.value = item_list.get(0)
     }
@@ -435,13 +463,14 @@ class MainFragment : Fragment() {
         } else {
             getLocation()
             DialogManager.LocationSettingsDialog(requireContext (), object : DialogManager.Listener{
-                override fun onClick() {
+                override fun onClick(city_name: String?) {
                     startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
                 }
 
             })
         }
     }
+    @SuppressLint("SuspiciousIndentation")
     private fun isLocationEnabled(): Boolean {
         val lm = activity?.getSystemService(Context.LOCATION_SERVICE) as LocationManager
                 return lm.isProviderEnabled(LocationManager.GPS_PROVIDER)

@@ -6,6 +6,7 @@ import com.example.weatherapp.DataModels.WeatherDayItem
 import com.example.weatherapp.DataModels.WeatherHoursModel
 
 class MainViewModel: ViewModel() {
+    var city: String? = null
     var live_data_main = MutableLiveData<WeatherDayItem>()
 
     var live_data_days = MutableLiveData<MutableList<WeatherDayItem>>()
