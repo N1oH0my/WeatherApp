@@ -2,10 +2,12 @@ package com.example.weatherapp.Fragments
 
 import android.Manifest
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Address
 import android.location.Geocoder
 import android.location.Location
+import android.location.LocationManager
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -39,6 +41,7 @@ import org.json.JSONException
 import org.json.JSONObject
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import android.provider.Settings
 
 
 class MainFragment : Fragment() {
@@ -107,8 +110,14 @@ class MainFragment : Fragment() {
         }.attach()
 
         idLocationBtn.setOnClickListener {
-            getLocation()
+            checkLocation()
         }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    override fun onResume() {
+        super.onResume()
+        checkLocation()
     }
     //----------------------Permissions------------------------------------------
     @RequiresApi(Build.VERSION_CODES.O)
@@ -134,7 +143,7 @@ class MainFragment : Fragment() {
         if (!hasLocationPermissions()) {
             PermissionListener()
         } else {
-            getLocation()
+            //getLocation()
         }
     }
 
@@ -416,6 +425,26 @@ class MainFragment : Fragment() {
         val formattedDate = dateTime.format(formatterOut)
 
         return formattedDate
+    }
+    //------------------------DialogManager----------------------------------------
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun checkLocation() {
+
+        if (isLocationEnabled()) {
+            getLocation()
+        } else {
+            getLocation()
+            DialogManager.LocationSettingsDialog(requireContext (), object : DialogManager.Listener{
+                override fun onClick() {
+                    startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
+                }
+
+            })
+        }
+    }
+    private fun isLocationEnabled(): Boolean {
+        val lm = activity?.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+                return lm.isProviderEnabled(LocationManager.GPS_PROVIDER)
     }
     //------------------------Update----------------------------------------
     private fun UpdateCurrentData() = with(binding)
