@@ -53,8 +53,9 @@ import java.util.Locale
 
 class MainFragment : Fragment() {
 
-    private val WEATHER_API_KEY: String = "ZhvnfeXeICWsbRy1Xy0hxUN2ajAtfLnV"
+    //private val WEATHER_API_KEY: String = "ZhvnfeXeICWsbRy1Xy0hxUN2ajAtfLnV"
     //private val WEATHER_API_KEY: String = "FPv7HgXJ8uHDgICrYKtJmwyj67bsf00G"
+    private val WEATHER_API_KEY: String = "fGr9YGaFhvwwHk3hnso0j5UfT0HzVrLn"
     private lateinit var binding: FragmentMainBinding
     private lateinit var p_launcher: ActivityResultLauncher<String>
     private lateinit var f_location_client: FusedLocationProviderClient
@@ -98,7 +99,7 @@ class MainFragment : Fragment() {
         UpdateCurrentData()
         UpdateCurrentDataLanguage()
         Init()
-
+        PermissionChecker()
         var  language = saved_info.getSelectedLanguage()
         var  city = saved_info.getSelectedCity()
 
@@ -108,17 +109,18 @@ class MainFragment : Fragment() {
         else
         {
             saved_info.saveSelectedCity("Voronezh")
+
         }
         if (language != null)
         {
             saved_info.saveSelectedLanguage(language)
-            PermissionChecker(language)
+
             cur_data.live_language.value = language
         }
         else
         {
             saved_info.saveSelectedLanguage("ru")
-            PermissionChecker("ru")
+
             cur_data.live_language.value = "ru"
         }
         //getLocation("ru")
@@ -223,7 +225,7 @@ class MainFragment : Fragment() {
     }
     //----------------------Permissions------------------------------------------
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun PermissionListener(language: String = "en") {
+    private fun PermissionListener() {
         val permissionLauncher = registerForActivityResult(
             ActivityResultContracts.RequestMultiplePermissions()
         ) { permissions ->
@@ -231,7 +233,7 @@ class MainFragment : Fragment() {
                 permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true
             ) {
                 Toast.makeText(requireContext(), "Location permission granted", Toast.LENGTH_SHORT).show()
-                getLocation(language)
+                //getLocation(language)
             } else {
                 Toast.makeText(requireContext(), "Location permission denied", Toast.LENGTH_SHORT).show()
                 // Обработка случая, когда разрешение на местоположение отклонено
@@ -241,9 +243,9 @@ class MainFragment : Fragment() {
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun PermissionChecker(language: String = "en") {
+    private fun PermissionChecker() {
         if (!hasLocationPermissions()) {
-            PermissionListener(language)
+            PermissionListener()
         } else {
             //getLocation()
         }
@@ -311,7 +313,7 @@ class MainFragment : Fragment() {
         saved_info.saveSelectedCity(cur_city_name)
 
         FindLocationKey(requireContext(), cur_city_name) { locationKey ->
-            if (locationKey != null) {
+            if (locationKey != null && locationKey != "server_error") {
                 //Toast.makeText(activity, "Found $cur_city_name", Toast.LENGTH_SHORT).show()
 
                 DailyRequestWeather(requireContext(),locationKey, cur_city_name, language)
@@ -324,14 +326,17 @@ class MainFragment : Fragment() {
                         "\n ${cur_data.main_two._sunrise} \n ${cur_data.main_two._sunset}")
 
 
-            } else {
+            } else if(locationKey != "server_error") {
                 // Ключ расположения не найден или произошла ошибка,
                 var cityName = "Voronezh"
                 if (language == "ru")
                     cityName = "Воронеж"
                 GetAllForecasts(cityName, language)
-                Toast.makeText(activity, "Sry,\n weather for ur city was not found,\n enter the nearest city", Toast.LENGTH_SHORT).show()
+                Toast.makeText(activity, "Sry,\n weather for ur city was not found", Toast.LENGTH_SHORT).show()
 
+            }
+            else{
+                Toast.makeText(activity, "Sry,\nserver is temporarily unavailable or the tokens have run out", Toast.LENGTH_LONG).show()
             }
         }
     }
@@ -402,23 +407,6 @@ class MainFragment : Fragment() {
         queue.add(jsonArrayRequest)
     }
     private fun FindLocationKey(context: Context, city: String,language: String = "en", callback: (String?) -> Unit) {
-        /*val url = "http://dataservice.accuweather.com/locations/v1/cities/search?apikey=$WEATHER_API_KEY&q=$city&language=en&details=false&offset=1"
-
-        val requestQueue = Volley.newRequestQueue(context)
-        val jsonArrayRequest = JsonArrayRequest(Request.Method.GET, url, null,
-            Response.Listener { response ->
-                val locationKey = response.getJSONObject(0).getString("Key")
-                Log.d("MyLog", "location key: $locationKey \n")
-                callback(locationKey)
-            },
-            Response.ErrorListener { error ->
-                Log.d("MyLog", "lc error")
-                callback(null)
-            })
-
-        requestQueue.add(jsonArrayRequest)
-        */
-        //var language: String = "en"
         val url = "http://dataservice.accuweather.com/locations/v1/cities/search?apikey=" +
                 "$WEATHER_API_KEY&q=" +
                 "$city" +
@@ -442,8 +430,8 @@ class MainFragment : Fragment() {
                 }
             },
             Response.ErrorListener { error ->
-                Log.e("MyLog", "Volley request error: ${error.message}")
-                callback(null)
+                Log.e("MyLog", "Volley request error lc: ${error.message}")
+                callback("server_error")
             })
 
         requestQueue.add(jsonArrayRequest)
@@ -642,14 +630,6 @@ class MainFragment : Fragment() {
                 saved_info.saveSelectedLanguage(languageCode)
                 when (languageCode) {
                     "en" -> {
-                        if (idSupport.text != "Supportt")
-                        {
-                            val locale = Locale("en")
-                            Locale.setDefault(locale)
-                            val resources = resources
-                            val configuration = resources.configuration
-                            configuration.locale = locale
-                            resources.updateConfiguration(configuration, resources.displayMetrics)
 
                             idSupport.text = "Support"
                             idSeeMoreDetails.text = "See more details"
@@ -658,13 +638,20 @@ class MainFragment : Fragment() {
                             idTextSunrise.text = "Sunrise:"
                             idTextSunset.text = "Sunset:"
                             idBy.text = "by N1oH0my"
-
+                            idSetLanguage.text = "Language"
                             val adapter = ViewPageAdapter(activity as FragmentActivity, f_list)
                             idViewPage.adapter = adapter
                             TabLayoutMediator(idHDaysBtn, idViewPage)
                             {
                                     tab, pos -> tab.text = hd_title_list_en[pos]
                             }.attach()
+
+                            val locale = Locale("en")
+                            Locale.setDefault(locale)
+                            val resources = resources
+                            val configuration = resources.configuration
+                            configuration.locale = locale
+                            resources.updateConfiguration(configuration, resources.displayMetrics)
 
                             val last_city = saved_info.getSelectedCity()
                             if (last_city != null)
@@ -675,18 +662,8 @@ class MainFragment : Fragment() {
                             {
                                 checkLocation(languageCode)
                             }
-                        }
                     }
                     "ru" -> {
-                        if (idSupport.text != "Поддержка")
-                        {
-
-                            val locale = Locale("ru")
-                            Locale.setDefault(locale)
-                            val resources = resources
-                            val configuration = resources.configuration
-                            configuration.locale = locale
-                            resources.updateConfiguration(configuration, resources.displayMetrics)
 
                             idSupport.text = "Поддержка"
                             idSetLanguage.text = "Язык"
@@ -696,6 +673,13 @@ class MainFragment : Fragment() {
                             idTextSunrise.text = "Восход:"
                             idTextSunset.text = "Закат:"
                             idBy.text = "создано N1oH0my"
+
+                            val locale = Locale("ru")
+                            Locale.setDefault(locale)
+                            val resources = resources
+                            val configuration = resources.configuration
+                            configuration.locale = locale
+                            resources.updateConfiguration(configuration, resources.displayMetrics)
 
                             val adapter = ViewPageAdapter(activity as FragmentActivity, f_list)
                             idViewPage.adapter = adapter
@@ -712,7 +696,7 @@ class MainFragment : Fragment() {
                             {
                                 checkLocation(languageCode)
                             }
-                        }
+
                     }
                     else -> {
 

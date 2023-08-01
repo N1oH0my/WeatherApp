@@ -308,7 +308,6 @@
         android:layout_marginTop="3dp"
         android:layout_marginEnd="3dp"
         android:layout_marginBottom="10dp"
-        android:foregroundGravity="top|center|fill"
         app:layout_constraintBottom_toTopOf="@+id/id_see_more_details"
         app:layout_constraintEnd_toEndOf="@+id/id_h_days_btn"
         app:layout_constraintStart_toStartOf="@+id/id_h_days_btn"
