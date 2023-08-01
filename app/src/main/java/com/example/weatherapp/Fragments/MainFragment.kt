@@ -1,5 +1,6 @@
 package com.example.weatherapp.Fragments
 
+import PreferenceHelper
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
@@ -59,6 +60,7 @@ class MainFragment : Fragment() {
     private lateinit var f_location_client: FusedLocationProviderClient
 
     private val cur_data: MainViewModel by activityViewModels()
+    private lateinit var saved_info:PreferenceHelper
 
     private var f_list = listOf(
         HoursFragment.newInstance(),
@@ -97,8 +99,28 @@ class MainFragment : Fragment() {
         UpdateCurrentDataLanguage()
         Init()
 
-        PermissionChecker()
-        cur_data.live_language.value = "ru"
+        var  language = saved_info.getSelectedLanguage()
+        var  city = saved_info.getSelectedCity()
+
+        if (city != null) {
+            saved_info.saveSelectedCity(city)
+        }
+        else
+        {
+            saved_info.saveSelectedCity("Voronezh")
+        }
+        if (language != null)
+        {
+            saved_info.saveSelectedLanguage(language)
+            PermissionChecker(language)
+            cur_data.live_language.value = language
+        }
+        else
+        {
+            saved_info.saveSelectedLanguage("ru")
+            PermissionChecker("ru")
+            cur_data.live_language.value = "ru"
+        }
         //getLocation("ru")
 
 
@@ -115,7 +137,7 @@ class MainFragment : Fragment() {
     private fun Init() = with(binding)
     {
 
-
+        saved_info = PreferenceHelper(requireContext())
         f_location_client = LocationServices.getFusedLocationProviderClient(requireContext())
         val adapter = ViewPageAdapter(activity as FragmentActivity, f_list)
 
@@ -144,11 +166,16 @@ class MainFragment : Fragment() {
         }
 
         idLocationBtn.setOnClickListener {
-            if (cur_data.live_language.value != null) {
+            var language = saved_info.getSelectedLanguage()
+            if (language!= null)
+            {
+                checkLocation(language)
+            }
+            else if (cur_data.live_language.value != null) {
                 checkLocation( cur_data.live_language.value!!)
             }
             else{
-                checkLocation()
+                checkLocation("ru")
             }
 
         }
@@ -156,12 +183,17 @@ class MainFragment : Fragment() {
             DialogManager.FindByNameDialog(requireContext(), object: DialogManager.Listener{
                 override fun onClick(city_name: String?) {
                     Log.d("MyLog", "$city_name")
+                    var language = saved_info.getSelectedLanguage()
                     if (city_name != null) {
-                        if (cur_data.live_language.value != null) {
+                        if (language!= null)
+                        {
+                            GetAllForecasts(city_name, language)
+                        }
+                        else if (cur_data.live_language.value != null) {
                             GetAllForecasts(city_name, cur_data.live_language.value!!)
                         }
                         else{
-                            GetAllForecasts(city_name)
+                            GetAllForecasts(city_name, "ru")
                         }
                     }
                 }
@@ -173,7 +205,8 @@ class MainFragment : Fragment() {
             DialogManager.SetLanguageDialog(requireContext(), object: DialogManager.Listener{
                 override fun onClick(language: String?) {
                     Log.d("MyLog", "$language")
-                    if (cur_data.live_language.value != language)
+                    var last_language = saved_info.getSelectedLanguage()
+                    if (last_language != language)
                     {
                         cur_data.live_language.value = language
                     }
@@ -275,6 +308,8 @@ class MainFragment : Fragment() {
     @RequiresApi(Build.VERSION_CODES.O)
     private fun GetAllForecasts(cur_city_name: String, language: String = "en")
     {
+        saved_info.saveSelectedCity(cur_city_name)
+
         FindLocationKey(requireContext(), cur_city_name) { locationKey ->
             if (locationKey != null) {
                 //Toast.makeText(activity, "Found $cur_city_name", Toast.LENGTH_SHORT).show()
@@ -604,9 +639,10 @@ class MainFragment : Fragment() {
             //cur_data.live_language.value?.let { it1 -> checkLocation(it1) }
             if (languageCode!="null")
             {
+                saved_info.saveSelectedLanguage(languageCode)
                 when (languageCode) {
                     "en" -> {
-                        if (idSupport.text != "Support")
+                        if (idSupport.text != "Supportt")
                         {
                             val locale = Locale("en")
                             Locale.setDefault(locale)
@@ -629,12 +665,22 @@ class MainFragment : Fragment() {
                             {
                                     tab, pos -> tab.text = hd_title_list_en[pos]
                             }.attach()
-                            checkLocation(languageCode)
+
+                            val last_city = saved_info.getSelectedCity()
+                            if (last_city != null)
+                            {
+                                GetAllForecasts(last_city, languageCode)
+                            }
+                            else
+                            {
+                                checkLocation(languageCode)
+                            }
                         }
                     }
                     "ru" -> {
                         if (idSupport.text != "Поддержка")
                         {
+
                             val locale = Locale("ru")
                             Locale.setDefault(locale)
                             val resources = resources
@@ -657,7 +703,15 @@ class MainFragment : Fragment() {
                             {
                                     tab, pos -> tab.text = hd_title_list_ru[pos]
                             }.attach()
-                            checkLocation(languageCode)
+                            val last_city = saved_info.getSelectedCity()
+                            if (last_city != null)
+                            {
+                                GetAllForecasts(last_city, languageCode)
+                            }
+                            else
+                            {
+                                checkLocation(languageCode)
+                            }
                         }
                     }
                     else -> {
