@@ -8,7 +8,9 @@ import com.example.weatherapp.DataModels.WeatherNowModel
 
 class MainViewModel: ViewModel() {
     var mobile_link: String? = null
-    var language: String = "en"
+
+    var live_language = MutableLiveData<String>()
+
     var main_one = WeatherMainOneH()
     var main_two = WeatherMainTwoD()
     var live_data_main_one = MutableLiveData<WeatherMainOneH>()

@@ -47,6 +47,7 @@ import android.provider.Settings
 import com.example.weatherapp.DataModels.WeatherNowModel
 import com.squareup.picasso.Picasso
 import kotlinx.coroutines.delay
+import java.util.Locale
 
 
 class MainFragment : Fragment() {
@@ -63,9 +64,13 @@ class MainFragment : Fragment() {
         HoursFragment.newInstance(),
         DaysFragment.newInstance(),
     )
-    private val hd_title_list = listOf(
+    private val hd_title_list_en = listOf(
         "Hourly",
         "Daily",
+    )
+    private val hd_title_list_ru = listOf(
+        "Часы",
+        "Дни",
     )
     private val locationPermission = arrayOf(
         Manifest.permission.ACCESS_FINE_LOCATION,
@@ -89,10 +94,12 @@ class MainFragment : Fragment() {
             WindowManager.LayoutParams.FLAG_FULLSCREEN);
         //---
         UpdateCurrentData()
+        UpdateCurrentDataLanguage()
         Init()
 
         PermissionChecker()
-        //getLocation()
+        cur_data.live_language.value = "ru"
+        //getLocation("ru")
 
 
 
@@ -107,6 +114,8 @@ class MainFragment : Fragment() {
     @RequiresApi(Build.VERSION_CODES.O)
     private fun Init() = with(binding)
     {
+
+
         f_location_client = LocationServices.getFusedLocationProviderClient(requireContext())
         val adapter = ViewPageAdapter(activity as FragmentActivity, f_list)
 
@@ -114,7 +123,7 @@ class MainFragment : Fragment() {
 
         TabLayoutMediator(idHDaysBtn, idViewPage)
         {
-            tab, pos -> tab.text = hd_title_list[pos]
+            tab, pos -> tab.text = hd_title_list_en[pos]
         }.attach()
 
         idSeeMoreDetails.setOnClickListener {
@@ -135,20 +144,43 @@ class MainFragment : Fragment() {
         }
 
         idLocationBtn.setOnClickListener {
-            checkLocation()
+            if (cur_data.live_language.value != null) {
+                checkLocation( cur_data.live_language.value!!)
+            }
+            else{
+                checkLocation()
+            }
+
         }
         idSearchBtn.setOnClickListener {
             DialogManager.FindByNameDialog(requireContext(), object: DialogManager.Listener{
                 override fun onClick(city_name: String?) {
                     Log.d("MyLog", "$city_name")
                     if (city_name != null) {
-                        GetAllForecasts(city_name)
+                        if (cur_data.live_language.value != null) {
+                            GetAllForecasts(city_name, cur_data.live_language.value!!)
+                        }
+                        else{
+                            GetAllForecasts(city_name)
+                        }
                     }
                 }
 
             })
         }
 
+        idSetLanguage.setOnClickListener {
+            DialogManager.SetLanguageDialog(requireContext(), object: DialogManager.Listener{
+                override fun onClick(language: String?) {
+                    Log.d("MyLog", "$language")
+                    if (cur_data.live_language.value != language)
+                    {
+                        cur_data.live_language.value = language
+                    }
+                }
+
+            })
+        }
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -158,7 +190,7 @@ class MainFragment : Fragment() {
     }
     //----------------------Permissions------------------------------------------
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun PermissionListener() {
+    private fun PermissionListener(language: String = "en") {
         val permissionLauncher = registerForActivityResult(
             ActivityResultContracts.RequestMultiplePermissions()
         ) { permissions ->
@@ -166,7 +198,7 @@ class MainFragment : Fragment() {
                 permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true
             ) {
                 Toast.makeText(requireContext(), "Location permission granted", Toast.LENGTH_SHORT).show()
-                getLocation()
+                getLocation(language)
             } else {
                 Toast.makeText(requireContext(), "Location permission denied", Toast.LENGTH_SHORT).show()
                 // Обработка случая, когда разрешение на местоположение отклонено
@@ -176,9 +208,9 @@ class MainFragment : Fragment() {
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun PermissionChecker() {
+    private fun PermissionChecker(language: String = "en") {
         if (!hasLocationPermissions()) {
-            PermissionListener()
+            PermissionListener(language)
         } else {
             //getLocation()
         }
@@ -192,7 +224,7 @@ class MainFragment : Fragment() {
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun getLocation() {
+    private fun getLocation(language: String = "en") {
         if (!hasLocationPermissions()) {
             // Разрешения на местоположение не предоставлены
             return
@@ -213,7 +245,7 @@ class MainFragment : Fragment() {
                 if (location != null) {
                     val cityName = getCityName(location.latitude, location.longitude)
                     Toast.makeText(requireContext(), "Your city is $cityName", Toast.LENGTH_SHORT).show()
-                    GetAllForecasts(cityName)
+                    GetAllForecasts(cityName, language)
                 } else {
                     Toast.makeText(requireContext(), "Location is null", Toast.LENGTH_SHORT).show()
                 }
@@ -241,14 +273,14 @@ class MainFragment : Fragment() {
 
     //---------------------------API-------------------------------------
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun GetAllForecasts(cur_city_name: String)
+    private fun GetAllForecasts(cur_city_name: String, language: String = "en")
     {
         FindLocationKey(requireContext(), cur_city_name) { locationKey ->
             if (locationKey != null) {
-                Toast.makeText(activity, "Found $cur_city_name", Toast.LENGTH_SHORT).show()
+                //Toast.makeText(activity, "Found $cur_city_name", Toast.LENGTH_SHORT).show()
 
-                DailyRequestWeather(requireContext(),locationKey, cur_city_name)
-                HourlyRequestWeather(requireContext(),locationKey)
+                DailyRequestWeather(requireContext(),locationKey, cur_city_name, language)
+                HourlyRequestWeather(requireContext(),locationKey, language)
 
                 Log.d("ML", "My Item MAIN1\n${cur_data.main_one._cur_sky} \n ${cur_data.main_one._cur_temp} \n ${cur_data.main_one._cur_sky_img_url}")
                 Log.d("ML", "MAIN2\n${cur_data.main_two._city} \n${cur_data.main_two._date}" +
@@ -259,17 +291,19 @@ class MainFragment : Fragment() {
 
             } else {
                 // Ключ расположения не найден или произошла ошибка,
-                val cityName = "Voronezh"
-                GetAllForecasts(cityName)
-                Toast.makeText(activity, "Sry,\n weather for ur city was not found,\n enter the nearest city", Toast.LENGTH_LONG).show()
+                var cityName = "Voronezh"
+                if (language == "ru")
+                    cityName = "Воронеж"
+                GetAllForecasts(cityName, language)
+                Toast.makeText(activity, "Sry,\n weather for ur city was not found,\n enter the nearest city", Toast.LENGTH_SHORT).show()
 
             }
         }
     }
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun DailyRequestWeather(context: Context, locationKey: String, city_name: String) {
+    private fun DailyRequestWeather(context: Context, locationKey: String, city_name: String, language: String = "en") {
         val queue = Volley.newRequestQueue(context)
-        var language: String = "ru"
+        //var language: String = "ru"
         val url =
             "http://dataservice.accuweather.com/forecasts/v1/daily/5day/" +
                     "$locationKey?" +
@@ -297,7 +331,7 @@ class MainFragment : Fragment() {
                 }
                 Log.d("MyLog", "weather days ok\n")
 
-                ParseDailyDataFromJsonObjects(jsonObjectList, city_name)
+                ParseDailyDataFromJsonObjects(jsonObjectList, city_name, language)
             },
             Response.ErrorListener { error ->
                 Log.d("MyLog", "weather error")
@@ -305,9 +339,9 @@ class MainFragment : Fragment() {
 
         queue.add(jsonArrayRequest)
     }
-    private fun HourlyRequestWeather(context: Context, locationKey: String) {
+    private fun HourlyRequestWeather(context: Context, locationKey: String, language: String = "en") {
         val queue = Volley.newRequestQueue(context)
-        var language: String = "ru"
+        //var language: String = "ru"
         val url =
             "http://dataservice.accuweather.com/forecasts/v1/hourly/12hour/" +
                     "$locationKey?" +
@@ -332,7 +366,7 @@ class MainFragment : Fragment() {
 
         queue.add(jsonArrayRequest)
     }
-    private fun FindLocationKey(context: Context, city: String, callback: (String?) -> Unit) {
+    private fun FindLocationKey(context: Context, city: String,language: String = "en", callback: (String?) -> Unit) {
         /*val url = "http://dataservice.accuweather.com/locations/v1/cities/search?apikey=$WEATHER_API_KEY&q=$city&language=en&details=false&offset=1"
 
         val requestQueue = Volley.newRequestQueue(context)
@@ -349,7 +383,7 @@ class MainFragment : Fragment() {
 
         requestQueue.add(jsonArrayRequest)
         */
-        var language: String = "en"
+        //var language: String = "en"
         val url = "http://dataservice.accuweather.com/locations/v1/cities/search?apikey=" +
                 "$WEATHER_API_KEY&q=" +
                 "$city" +
@@ -410,7 +444,7 @@ class MainFragment : Fragment() {
         cur_data.live_data_main_one.value = cur_data.main_one
     }
     @RequiresApi(Build.VERSION_CODES.O)
-    fun ParseDailyDataFromJsonObjects(jsonObjects: List<JSONObject>, city_name: String) {
+    fun ParseDailyDataFromJsonObjects(jsonObjects: List<JSONObject>, city_name: String, language: String = "en") {
         var item_list: MutableList<WeatherDayItem> = mutableListOf()
         for (jsonObject in jsonObjects) {
 
@@ -428,7 +462,7 @@ class MainFragment : Fragment() {
 
             val item = WeatherDayItem(
                 _city = city_name,
-                _date = ParseDateString(date_time),
+                _date = ParseDateString(date_time, language),
                 _max_temp = jsonObject.getJSONObject("Temperature")
                     .getJSONObject("Maximum").getString("Value")+" °C",
                 _min_temp = jsonObject.getJSONObject("Temperature")
@@ -499,9 +533,22 @@ class MainFragment : Fragment() {
         }?: time
     }
     @RequiresApi(Build.VERSION_CODES.O)
-    fun ParseDateString(dateString: String): String {
+    /*fun ParseDateString(dateString: String): String {
         val formatterIn = DateTimeFormatter.ISO_OFFSET_DATE_TIME
         val formatterOut = DateTimeFormatter.ofPattern("d MMMM")
+
+        val dateTime = LocalDateTime.parse(dateString, formatterIn)
+        val formattedDate = dateTime.format(formatterOut)
+
+        return formattedDate
+    }*/
+    fun ParseDateString(dateString: String, language: String): String {
+        val formatterIn = DateTimeFormatter.ISO_OFFSET_DATE_TIME
+        val formatterOut = when (language.toLowerCase()) {
+            "ru" -> DateTimeFormatter.ofPattern("d MMMM", Locale("ru"))
+            "en" -> DateTimeFormatter.ofPattern("d MMMM", Locale("en"))
+            else -> throw IllegalArgumentException("Unsupported language: $language")
+        }
 
         val dateTime = LocalDateTime.parse(dateString, formatterIn)
         val formattedDate = dateTime.format(formatterOut)
@@ -510,10 +557,10 @@ class MainFragment : Fragment() {
     }
     //------------------------DialogManager----------------------------------------
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun checkLocation() {
+    private fun checkLocation(language: String = "en") {
 
         if (isLocationEnabled()) {
-            getLocation()
+            getLocation(language)
         } else {
             //getLocation()
             DialogManager.LocationSettingsDialog(requireContext (), object : DialogManager.Listener{
@@ -547,6 +594,78 @@ class MainFragment : Fragment() {
             idCurSunrise.text = it._sunrise
             idCurSunset.text = it._sunset
             idAlert.text = it._alert
+        }
+    }
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun UpdateCurrentDataLanguage() = with(binding)
+    {
+        cur_data.live_language.observe(viewLifecycleOwner){
+            val languageCode:String = cur_data.live_language.value?: "null"
+            //cur_data.live_language.value?.let { it1 -> checkLocation(it1) }
+            if (languageCode!="null")
+            {
+                when (languageCode) {
+                    "en" -> {
+                        if (idSupport.text != "Support")
+                        {
+                            val locale = Locale("en")
+                            Locale.setDefault(locale)
+                            val resources = resources
+                            val configuration = resources.configuration
+                            configuration.locale = locale
+                            resources.updateConfiguration(configuration, resources.displayMetrics)
+
+                            idSupport.text = "Support"
+                            idSeeMoreDetails.text = "See more details"
+                            idTextAir.text = "Air:"
+                            idTextWind.text = "Wind:"
+                            idTextSunrise.text = "Sunrise:"
+                            idTextSunset.text = "Sunset:"
+                            idBy.text = "by N1oH0my"
+
+                            val adapter = ViewPageAdapter(activity as FragmentActivity, f_list)
+                            idViewPage.adapter = adapter
+                            TabLayoutMediator(idHDaysBtn, idViewPage)
+                            {
+                                    tab, pos -> tab.text = hd_title_list_en[pos]
+                            }.attach()
+                            checkLocation(languageCode)
+                        }
+                    }
+                    "ru" -> {
+                        if (idSupport.text != "Поддержка")
+                        {
+                            val locale = Locale("ru")
+                            Locale.setDefault(locale)
+                            val resources = resources
+                            val configuration = resources.configuration
+                            configuration.locale = locale
+                            resources.updateConfiguration(configuration, resources.displayMetrics)
+
+                            idSupport.text = "Поддержка"
+                            idSetLanguage.text = "Язык"
+                            idSeeMoreDetails.text = "Посмотреть подробнее"
+                            idTextAir.text = "Категория воздуха:"
+                            idTextWind.text = "Ветер:"
+                            idTextSunrise.text = "Восход:"
+                            idTextSunset.text = "Закат:"
+                            idBy.text = "создано N1oH0my"
+
+                            val adapter = ViewPageAdapter(activity as FragmentActivity, f_list)
+                            idViewPage.adapter = adapter
+                            TabLayoutMediator(idHDaysBtn, idViewPage)
+                            {
+                                    tab, pos -> tab.text = hd_title_list_ru[pos]
+                            }.attach()
+                            checkLocation(languageCode)
+                        }
+                    }
+                    else -> {
+
+                    }
+                }
+            }
+
         }
     }
     //----------------------------------------------------------------

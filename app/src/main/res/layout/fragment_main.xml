@@ -107,16 +107,14 @@
                 android:id="@+id/id_cur_air"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="1dp"
-                android:layout_marginTop="8dp"
                 android:backgroundTint="#54296A"
                 android:fontFamily="@font/amiko_semibold"
                 android:text="Good"
                 android:textAllCaps="false"
                 android:textColor="#0E0721"
                 android:textSize="20sp"
-                app:layout_constraintStart_toEndOf="@+id/id_text_air"
-                app:layout_constraintTop_toBottomOf="@+id/id_cur_sky" />
+                app:layout_constraintStart_toStartOf="@+id/id_text_air"
+                app:layout_constraintTop_toBottomOf="@+id/id_text_air" />
 
             <TextView
                 android:id="@+id/id_text_air"
@@ -138,86 +136,83 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:layout_marginEnd="1dp"
                 android:backgroundTint="#54296A"
                 android:fontFamily="@font/amiko_semibold"
                 android:text="Wind: "
                 android:textAllCaps="false"
                 android:textColor="@color/white"
                 android:textSize="20sp"
-                app:layout_constraintEnd_toStartOf="@+id/id_cur_wind"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/id_cur_temp"
                 app:layout_constraintTop_toBottomOf="@+id/id_cur_sky" />
 
             <TextView
                 android:id="@+id/id_cur_wind"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:layout_marginEnd="10dp"
                 android:backgroundTint="#54296A"
                 android:fontFamily="@font/amiko_semibold"
                 android:text="5 km/h ЮЮЗ"
                 android:textAllCaps="false"
                 android:textColor="#0E0721"
                 android:textSize="20sp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/id_cur_sky" />
+                app:layout_constraintStart_toStartOf="@+id/id_text_wind"
+                app:layout_constraintTop_toBottomOf="@+id/id_text_wind" />
 
             <TextView
                 android:id="@+id/id_cur_sunrise"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="5dp"
                 android:backgroundTint="#54296A"
                 android:fontFamily="@font/amiko_semibold"
                 android:text="4:38am"
                 android:textAllCaps="false"
                 android:textColor="#0E0721"
                 android:textSize="20sp"
-                app:layout_constraintStart_toEndOf="@+id/id_text_sunrise"
-                app:layout_constraintTop_toBottomOf="@+id/id_cur_air" />
+                app:layout_constraintBottom_toTopOf="@+id/id_alert"
+                app:layout_constraintStart_toStartOf="@+id/id_text_sunrise"
+                app:layout_constraintTop_toBottomOf="@+id/id_text_sunrise"
+                app:layout_constraintVertical_bias="0.0" />
 
             <TextView
                 android:id="@+id/id_text_sunrise"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
                 android:backgroundTint="#54296A"
                 android:fontFamily="@font/amiko_semibold"
                 android:text="Sunrise: "
                 android:textAllCaps="false"
                 android:textColor="@color/white"
                 android:textSize="20sp"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/id_text_air" />
+                app:layout_constraintStart_toStartOf="@+id/id_cur_air"
+                app:layout_constraintTop_toBottomOf="@+id/id_cur_air" />
 
             <TextView
                 android:id="@+id/id_text_sunset"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="5dp"
                 android:backgroundTint="#54296A"
                 android:fontFamily="@font/amiko_semibold"
                 android:text="Sunset: "
                 android:textAllCaps="false"
                 android:textColor="@color/white"
                 android:textSize="20sp"
-                app:layout_constraintEnd_toStartOf="@+id/id_cur_sunset"
-                app:layout_constraintTop_toBottomOf="@+id/id_text_wind" />
+                app:layout_constraintStart_toStartOf="@+id/id_cur_wind"
+                app:layout_constraintTop_toBottomOf="@+id/id_cur_wind" />
 
             <TextView
                 android:id="@+id/id_cur_sunset"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="10dp"
                 android:backgroundTint="#54296A"
                 android:fontFamily="@font/amiko_semibold"
                 android:text="8:00pm"
                 android:textAllCaps="false"
                 android:textColor="#0E0721"
                 android:textSize="20sp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/id_cur_wind" />
+                app:layout_constraintBottom_toTopOf="@+id/id_alert"
+                app:layout_constraintStart_toStartOf="@+id/id_text_sunset"
+                app:layout_constraintTop_toBottomOf="@+id/id_text_sunset" />
 
             <ImageButton
                 android:id="@+id/id_search_btn"
@@ -260,7 +255,6 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
-                android:layout_marginTop="10dp"
                 android:layout_marginEnd="10dp"
                 android:layout_marginBottom="10dp"
                 android:backgroundTint="#54296A"
@@ -272,8 +266,7 @@
                 android:textSize="20sp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/id_text_sunrise" />
+                app:layout_constraintStart_toStartOf="parent" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>
@@ -328,32 +321,52 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
         android:layout_marginBottom="10dp"
+        android:fontFamily="@font/amiko_semibold"
         android:text="Support"
         android:textColor="#990E0721"
+        android:textSize="12sp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="@+id/id_view_page" />
+        app:layout_constraintStart_toEndOf="@+id/id_set_language" />
 
     <TextView
         android:id="@+id/id_see_more_details"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
         android:layout_marginBottom="10dp"
+        android:fontFamily="@font/amiko_semibold"
         android:text="See more details"
         android:textColor="#990E0721"
+        android:textSize="12sp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/textView3"
-        app:layout_constraintHorizontal_bias="0.55"
+        app:layout_constraintEnd_toStartOf="@+id/id_by"
         app:layout_constraintStart_toEndOf="@+id/id_support" />
 
     <TextView
-        android:id="@+id/textView3"
+        android:id="@+id/id_by"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="10dp"
+        android:layout_marginEnd="3dp"
         android:layout_marginBottom="10dp"
+        android:fontFamily="@font/amiko_semibold"
         android:text="By N1oH0my"
         android:textColor="#990E0721"
+        android:textSize="12sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/id_view_page" />
+
+    <TextView
+        android:id="@+id/id_set_language"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="3dp"
+        android:layout_marginBottom="10dp"
+        android:fontFamily="@font/amiko_semibold"
+        android:text="Language"
+        android:textColor="#990E0721"
+        android:textSize="12sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/id_view_page" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

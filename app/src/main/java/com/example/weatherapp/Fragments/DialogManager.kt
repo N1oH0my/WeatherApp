@@ -36,6 +36,22 @@ object DialogManager {
         }
         dialog.show()
     }
+    fun SetLanguageDialog(context: Context, listener: Listener) {
+        val builder = AlertDialog.Builder(context)
+        val languages = arrayOf("en", "ru")
+
+        builder.setTitle("Choose language:")
+            .setSingleChoiceItems(languages, -1) { dialog, which ->
+                val selectedLanguage = languages[which]
+                listener.onClick(selectedLanguage)
+                dialog.dismiss()
+            }
+            .setNegativeButton("Cancel") { dialog, _ ->
+                dialog.dismiss()
+            }
+        val dialog = builder.create()
+        dialog.show()
+    }
     interface Listener {
         fun onClick(city_name: String?)
     }

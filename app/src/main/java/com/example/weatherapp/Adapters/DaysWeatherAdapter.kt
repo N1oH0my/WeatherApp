@@ -1,5 +1,7 @@
 package com.example.weatherapp.Adapters
 
+import android.content.Context
+import android.provider.Settings.System.getString
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,7 +17,11 @@ class DaysWeatherAdapter: ListAdapter<WeatherDayItem, DaysWeatherAdapter.Holder>
 
     class Holder(view: View): RecyclerView.ViewHolder(view) {
         val binding = DaysListItemBinding.bind(view)
-        fun bind(item: WeatherDayItem) = with(binding) {
+        fun bind(item: WeatherDayItem, context: Context) = with(binding) {
+            idTextDDay.text = context.getString(R.string.Day)
+            idTextDNight.text = context.getString(R.string.Night)
+            idDTextWind.text = context.getString(R.string.Wind)
+
             idDDate.text = item._date
             idDTempMax.text = item._max_temp
             idDTempMin.text = item._min_temp
@@ -53,6 +59,8 @@ class DaysWeatherAdapter: ListAdapter<WeatherDayItem, DaysWeatherAdapter.Holder>
     }
 
     override fun onBindViewHolder(holder: Holder, position: Int) {
-        holder.bind(getItem(position))
+        val context = holder.itemView.context
+        // Use the 'context' variable as needed
+        holder.bind(getItem(position), context)
     }
 }
