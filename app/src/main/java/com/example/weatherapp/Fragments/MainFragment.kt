@@ -310,6 +310,7 @@ class MainFragment : Fragment() {
     @RequiresApi(Build.VERSION_CODES.O)
     private fun GetAllForecasts(cur_city_name: String, language: String = "en")
     {
+        /**/
         saved_info.saveSelectedCity(cur_city_name)
 
         FindLocationKey(requireContext(), cur_city_name) { locationKey ->
@@ -339,6 +340,7 @@ class MainFragment : Fragment() {
                 Toast.makeText(activity, "Sry,\nserver is temporarily unavailable or the tokens have run out", Toast.LENGTH_LONG).show()
             }
         }
+
     }
     @RequiresApi(Build.VERSION_CODES.O)
     private fun DailyRequestWeather(context: Context, locationKey: String, city_name: String, language: String = "en") {

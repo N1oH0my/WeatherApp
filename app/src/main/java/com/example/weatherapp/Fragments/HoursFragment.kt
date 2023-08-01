@@ -35,6 +35,7 @@ class HoursFragment : Fragment() {
         InitRecyclerView()
         cur_data.live_data_hours.observe(viewLifecycleOwner)
         {
+
             adapter.submitList(cur_data.live_data_hours.value)
         }
     }
@@ -47,13 +48,15 @@ class HoursFragment : Fragment() {
 
         /*
         val testlist = listOf<WeatherHoursModel>(
-            WeatherHoursModel("Partly Cloudy", "partly_cloudy_img.png", "22°C", "09:00 AM"),
-            WeatherHoursModel("Clear Skies", "clear_skies_img.png", "28°C", "02:00 PM"),
-            WeatherHoursModel("Thunderstorms", "thunderstorms_img.png", "17°C", "07:00 PM"),
+            WeatherHoursModel("Частичная облачность", "partly_cloudy_img.png", "22°C", "09:00 AM"),
+            WeatherHoursModel("Ясное небо", "clear_skies_img.png", "28°C", "02:00 PM"),
+            WeatherHoursModel("Грозы", "thunderstorms_img.png", "17°C", "07:00 PM"),
+            WeatherHoursModel("Пасмурно", "cloudy_img.png", "20°C", "10:00 AM"),
+            WeatherHoursModel("Дождь", "rain_img.png", "15°C", "03:00 PM"),
+            WeatherHoursModel("Солнечно", "sunny_img.png", "30°C", "08:00 PM")
         )
-        */
 
-        //adapter.submitList(testlist)
+        adapter.submitList(testlist)*/
     }
 
     companion object {
