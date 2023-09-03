@@ -1,6 +1,5 @@
 package com.example.weatherapp.Fragments
 
-import PreferenceHelper
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
@@ -45,25 +44,23 @@ import org.json.JSONObject
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import android.provider.Settings
-import com.example.weatherapp.DataModels.WeatherNowModel
 import com.example.weatherapp.ViewModels.DatabaseHelper
 import com.squareup.picasso.Picasso
-import kotlinx.coroutines.delay
 import java.util.Locale
 
 
 class MainFragment : Fragment() {
 
     //private val WEATHER_API_KEY: String = "ZhvnfeXeICWsbRy1Xy0hxUN2ajAtfLnV"
-    //private val WEATHER_API_KEY: String = "FPv7HgXJ8uHDgICrYKtJmwyj67bsf00G"
-    private val WEATHER_API_KEY: String = "fGr9YGaFhvwwHk3hnso0j5UfT0HzVrLn"
+    private val WEATHER_API_KEY: String = "FPv7HgXJ8uHDgICrYKtJmwyj67bsf00G"
+    //private val WEATHER_API_KEY: String = "fGr9YGaFhvwwHk3hnso0j5UfT0HzVrLn"
     private lateinit var binding: FragmentMainBinding
     private lateinit var p_launcher: ActivityResultLauncher<String>
     private lateinit var f_location_client: FusedLocationProviderClient
 
     private val cur_data: MainViewModel by activityViewModels()
     //private lateinit var saved_info:PreferenceHelper
-    private var dbHelper: DatabaseHelper? = null
+    private lateinit var dbHelper: DatabaseHelper
 
     private var f_list = listOf(
         HoursFragment.newInstance(),
@@ -102,18 +99,17 @@ class MainFragment : Fragment() {
         UpdateCurrentDataLanguage()
         Init()
         PermissionChecker()
-        if (!hasLocationPermissions())
+        /*if (!hasLocationPermissions())
         {
-            var  language = dbHelper?.getSelectedLanguage()
-            var  city = dbHelper?.getCurrentCity()
-            if (language!= null && city!= null)
-                GetAllForecasts(city, language)
-            else if (city!= null)
-                GetAllForecasts(city)
-        }
 
-
-
+        }*/
+        var  language = dbHelper.getSelectedLanguage()
+        var  city = dbHelper.getCurrentCity()
+        Log.d("DBB", "Saved l: $language, c: $city")
+        if(language!= null)
+            cur_data.live_language.value = language
+        else if (city!= null)
+            GetAllForecasts(city)
 
         /*
         if (city != null) {
@@ -188,6 +184,7 @@ class MainFragment : Fragment() {
 
         idLocationBtn.setOnClickListener {
             var language = dbHelper?.getSelectedLanguage()
+            Log.d("DBB", "Saved l by locbtn: $language")
             if (language!= null)
             {
                 checkLocation(language)
@@ -205,6 +202,7 @@ class MainFragment : Fragment() {
                 override fun onClick(city_name: String?) {
                     Log.d("MyLog", "$city_name")
                     var language = dbHelper?.getSelectedLanguage()
+                    Log.d("DBB", "Saved l by searchbtn: $language")
                     if (city_name != null) {
                         if (language!= null)
                         {
@@ -270,8 +268,8 @@ class MainFragment : Fragment() {
         if(language!= null)
             getLocation(language)
         else
-            getLocation()
-        */
+            getLocation()*/
+
     }
 
     @RequiresApi(Build.VERSION_CODES.M)
@@ -334,21 +332,21 @@ class MainFragment : Fragment() {
     private fun GetAllForecasts(cur_city_name: String, language: String = "en")
     {
         /**/
-        dbHelper?.setCurrentCity(cur_city_name)
-        dbHelper?.setSelectedLanguage(language)
+        dbHelper.setCurrentCity(cur_city_name)
+        dbHelper.setSelectedLanguage(language)
 
 
-        val retrievedCityCodes = dbHelper?.getCityCodes()
+        val retrievedCityCodes = dbHelper.getAllCities()
         var loc_key:Int? =  null;
         if (retrievedCityCodes!= null)
             loc_key = retrievedCityCodes.get(cur_city_name)
-
+        Log.d("DBB", "Saved lc: $loc_key, c: $cur_city_name")
         if (loc_key == null)
         {
             FindLocationKey(requireContext(), cur_city_name) { locationKey ->
                 if (locationKey != null && locationKey != "server_error") {
                     //Toast.makeText(activity, "Found $cur_city_name", Toast.LENGTH_SHORT).show()
-                    dbHelper?.setCityCode(cur_city_name, locationKey.toInt())
+                    dbHelper.addCity(cur_city_name, locationKey.toInt())
 
                     DailyRequestWeather(requireContext(),locationKey, cur_city_name, language)
                     HourlyRequestWeather(requireContext(),locationKey, language)
@@ -367,6 +365,7 @@ class MainFragment : Fragment() {
         {
             DailyRequestWeather(requireContext(),loc_key.toString(), cur_city_name, language)
             HourlyRequestWeather(requireContext(),loc_key.toString(), language)
+            Log.d("DBB", "Saved location key")
 
         }
 
@@ -663,7 +662,7 @@ class MainFragment : Fragment() {
             //cur_data.live_language.value?.let { it1 -> checkLocation(it1) }
             if (languageCode!="null")
             {
-                dbHelper?.setSelectedLanguage(languageCode)
+                dbHelper.setSelectedLanguage(languageCode)
                 when (languageCode) {
                     "en" -> {
 
@@ -689,7 +688,7 @@ class MainFragment : Fragment() {
                             configuration.locale = locale
                             resources.updateConfiguration(configuration, resources.displayMetrics)
 
-                            val last_city = dbHelper?.getCurrentCity()
+                            val last_city = dbHelper.getCurrentCity()
                             if (last_city != null)
                             {
                                 GetAllForecasts(last_city, languageCode)
@@ -724,7 +723,7 @@ class MainFragment : Fragment() {
                                     tab, pos -> tab.text = hd_title_list_ru[pos]
                             }.attach()
 
-                            val last_city = dbHelper?.getCurrentCity()
+                            val last_city = dbHelper.getCurrentCity()
                             if (last_city != null)
                             {
                                 GetAllForecasts(last_city, languageCode)

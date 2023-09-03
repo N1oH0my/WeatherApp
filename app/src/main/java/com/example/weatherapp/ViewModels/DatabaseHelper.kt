@@ -1,107 +1,169 @@
 package com.example.weatherapp.ViewModels
 import android.content.ContentValues
 import android.content.Context
-import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
-import android.util.Log
 
 class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
+
     companion object {
         private const val DATABASE_VERSION = 1
-        private const val DATABASE_NAME = "mydatabase.db"
-        private const val TABLE_NAME = "settings"
-        private const val COLUMN_ID = "id"
-        private const val COLUMN_CURRENT_CITY = "current_city"
-        private const val COLUMN_SELECTED_LANGUAGE = "selected_language"
+        private const val DATABASE_NAME = "city_database.db"
+
+        private const val TABLE_NAME = "city_table"
         private const val COLUMN_CITY_NAME = "city_name"
         private const val COLUMN_CITY_CODE = "city_code"
-    }
-    override fun onCreate(db: SQLiteDatabase) {
-        val createTable = "CREATE TABLE $TABLE_NAME ($COLUMN_ID INTEGER PRIMARY KEY AUTOINCREMENT, $COLUMN_CURRENT_CITY TEXT, $COLUMN_SELECTED_LANGUAGE TEXT, $COLUMN_CITY_NAME TEXT, $COLUMN_CITY_CODE INTEGER)"
-        db.execSQL(createTable)
+
+        private const val TABLE_SETTINGS = "settings_table"
+        private const val COLUMN_CURRENT_CITY = "current_city"
+        private const val COLUMN_SELECTED_LANGUAGE = "selected_language"
     }
 
-    override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
-        val dropTable = "DROP TABLE IF EXISTS $TABLE_NAME"
-        db.execSQL(dropTable)
+    override fun onCreate(db: SQLiteDatabase?) {
+        val createCityTableQuery = "CREATE TABLE $TABLE_NAME ($COLUMN_CITY_NAME TEXT PRIMARY KEY, $COLUMN_CITY_CODE INTEGER)"
+        val createSettingsTableQuery = "CREATE TABLE $TABLE_SETTINGS ($COLUMN_CURRENT_CITY TEXT, $COLUMN_SELECTED_LANGUAGE TEXT)"
+
+        db?.execSQL(createCityTableQuery)
+        db?.execSQL(createSettingsTableQuery)
+    }
+
+    override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
+        db?.execSQL("DROP TABLE IF EXISTS $TABLE_NAME")
+        db?.execSQL("DROP TABLE IF EXISTS $TABLE_SETTINGS")
         onCreate(db)
     }
-    fun getCurrentCity(): String? {
-        val query = "SELECT $COLUMN_CURRENT_CITY FROM $TABLE_NAME WHERE $COLUMN_ID = 1"
+
+    // 添加城市和代码到数据库
+    fun addCity(cityName: String, cityCode: Int) {
+        val values = ContentValues()
+        values.put(COLUMN_CITY_NAME, cityName)
+        values.put(COLUMN_CITY_CODE, cityCode)
+
+        val db = this.writableDatabase
+        db.insert(TABLE_NAME, null, values)
+        db.close()
+    }
+
+    // 获取所有城市和代码的哈希表
+    fun getAllCities(): HashMap<String, Int> {
+        val citiesMap = HashMap<String, Int>()
+        val query = "SELECT * FROM $TABLE_NAME"
+
         val db = this.readableDatabase
-        val cursor: Cursor = db.rawQuery(query, null)
+        val cursor = db.rawQuery(query, null)
+
+        if (cursor.moveToFirst()) {
+            do {
+                val cityIndex = cursor.getColumnIndex(COLUMN_CITY_NAME)
+                val codeIndex = cursor.getColumnIndex(COLUMN_CITY_CODE)
+
+                if (cityIndex >= 0 && codeIndex >= 0){
+                    val cityName = cursor.getString(cityIndex)
+                    val cityCode = cursor.getInt(codeIndex)
+
+                    citiesMap[cityName] = cityCode
+                }
+
+            } while (cursor.moveToNext())
+        }
+
+        cursor.close()
+        db.close()
+
+        return citiesMap
+    }
+
+    // 设置当前城市
+    fun setCurrentCity(cityName: String) {
+        /*
+        val values = ContentValues()
+        values.put(COLUMN_CURRENT_CITY, cityName)
+
+        val db = this.writableDatabase
+        db.delete(TABLE_SETTINGS, null, null)
+        db.insert(TABLE_SETTINGS, null, values)
+        db.close()*/
+        val values = ContentValues()
+        values.put(COLUMN_CURRENT_CITY, cityName)
+
+        val db = this.writableDatabase
+        val existingRecords = db.query(TABLE_SETTINGS, null, null, null, null, null, null)
+
+        if (existingRecords.moveToFirst()) {
+            db.update(TABLE_SETTINGS, values, null, null)
+        } else {
+            db.insert(TABLE_SETTINGS, null, values)
+        }
+
+        existingRecords.close()
+        db.close()
+    }
+
+    // 获取当前城市
+    fun getCurrentCity(): String? {
         var currentCity: String? = null
+        val query = "SELECT * FROM $TABLE_SETTINGS"
+
+        val db = this.readableDatabase
+        val cursor = db.rawQuery(query, null)
+
         if (cursor.moveToFirst()) {
             //currentCity = cursor.getString(cursor.getColumnIndex(COLUMN_CURRENT_CITY))
-            val columnIndex = cursor.getColumnIndex(COLUMN_CURRENT_CITY)
-            if (columnIndex >= 0) {
-                currentCity = cursor.getString(columnIndex)
+            val currentCityIndex = cursor.getColumnIndex(COLUMN_CURRENT_CITY)
+            if (currentCityIndex >= 0) {
+                currentCity = cursor.getString(currentCityIndex)
             }
         }
+
         cursor.close()
-        //db.close()
+        db.close()
+
         return currentCity
     }
-    fun setCurrentCity(city: String) {
-        val db = this.writableDatabase
-        val values = ContentValues().apply {
-            put(COLUMN_CURRENT_CITY, city)
-        }
-        db.update(TABLE_NAME, values, "$COLUMN_ID = ?", arrayOf("1"))
-        //db.close()
-    }
-    fun getSelectedLanguage(): String? {
-        val query = "SELECT $COLUMN_SELECTED_LANGUAGE FROM $TABLE_NAME WHERE $COLUMN_ID = 1"
-        val db = this.readableDatabase
-        val cursor: Cursor = db.rawQuery(query, null)
-        var selectedLanguage: String? = null
-        if (cursor.moveToFirst()) {
-            //selectedLanguage = cursor.getString(cursor.getColumnIndex(COLUMN_SELECTED_LANGUAGE))
-            val columnIndex = cursor.getColumnIndex(COLUMN_SELECTED_LANGUAGE)
-            if (columnIndex >= 0) {
-                selectedLanguage = cursor.getString(columnIndex)
-            }
-        }
-        cursor.close()
-        //db.close()
-        return selectedLanguage
-    }
+
+    // 设置选择的语言
     fun setSelectedLanguage(language: String) {
+        /*val values = ContentValues()
+        values.put(COLUMN_SELECTED_LANGUAGE, language)
+
         val db = this.writableDatabase
-        val values = ContentValues().apply {
-            put(COLUMN_SELECTED_LANGUAGE, language)
+        db.delete(TABLE_SETTINGS, null, null)
+        db.insert(TABLE_SETTINGS, null, values)
+        db.close()*/
+        val values = ContentValues()
+        values.put(COLUMN_SELECTED_LANGUAGE, language)
+
+        val db = this.writableDatabase
+        val existingRecords = db.query(TABLE_SETTINGS, null, null, null, null, null, null)
+
+        if (existingRecords.moveToFirst()) {
+            db.update(TABLE_SETTINGS, values, null, null)
+        } else {
+            db.insert(TABLE_SETTINGS, null, values)
         }
-        //db.update(TABLE_NAME, values, "$COLUMN_ID = 1", null)
-        db.update(TABLE_NAME, values, "$COLUMN_ID = ?", arrayOf("1"))
-        //db.close()
+
+        existingRecords.close()
+        db.close()
     }
-    fun getCityCodes(): HashMap<String, Int> {
-        val query = "SELECT $COLUMN_CITY_NAME, $COLUMN_CITY_CODE FROM $TABLE_NAME"
+
+    // 获取选择的语言
+    fun getSelectedLanguage(): String? {
+        var selectedLanguage: String? = null
+        val query = "SELECT * FROM $TABLE_SETTINGS"
+
         val db = this.readableDatabase
-        val cursor: Cursor = db.rawQuery(query, null)
-        val cityCodes = HashMap<String, Int>()
-        while (cursor.moveToNext()) {
-            val columnIndexCityName = cursor.getColumnIndex(COLUMN_CITY_NAME)
-            val columnIndexCityCode = cursor.getColumnIndex(COLUMN_CITY_CODE)
-            if (columnIndexCityName >= 0 && columnIndexCityCode >= 0) {
-                val cityName = cursor.getString(columnIndexCityName)
-                val cityCode = cursor.getInt(columnIndexCityCode)
-                cityCodes[cityName] = cityCode
+        val cursor = db.rawQuery(query, null)
+
+        if (cursor.moveToFirst()) {
+            val selectedLanguageIndex = cursor.getColumnIndex(COLUMN_SELECTED_LANGUAGE)
+            if (selectedLanguageIndex >= 0) {
+                selectedLanguage = cursor.getString(selectedLanguageIndex)
             }
         }
+
         cursor.close()
-        //db.close()
-        return cityCodes
-    }
-    fun setCityCode(cityName: String, cityCode: Int) {
-        val db = this.writableDatabase
-        val values = ContentValues().apply {
-            put(COLUMN_CITY_NAME, cityName)
-            put(COLUMN_CITY_CODE, cityCode)
-        }
-        db.insert(TABLE_NAME, null, values)
-        db.update(TABLE_NAME, values, "$COLUMN_ID = ?", arrayOf("1"))
-        //db.close()
+        db.close()
+
+        return selectedLanguage
     }
 }
