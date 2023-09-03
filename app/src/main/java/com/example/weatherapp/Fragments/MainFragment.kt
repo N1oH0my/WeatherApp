@@ -46,6 +46,7 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import android.provider.Settings
 import com.example.weatherapp.DataModels.WeatherNowModel
+import com.example.weatherapp.ViewModels.DatabaseHelper
 import com.squareup.picasso.Picasso
 import kotlinx.coroutines.delay
 import java.util.Locale
@@ -61,7 +62,8 @@ class MainFragment : Fragment() {
     private lateinit var f_location_client: FusedLocationProviderClient
 
     private val cur_data: MainViewModel by activityViewModels()
-    private lateinit var saved_info:PreferenceHelper
+    //private lateinit var saved_info:PreferenceHelper
+    private var dbHelper: DatabaseHelper? = null
 
     private var f_list = listOf(
         HoursFragment.newInstance(),
@@ -100,9 +102,20 @@ class MainFragment : Fragment() {
         UpdateCurrentDataLanguage()
         Init()
         PermissionChecker()
-        var  language = saved_info.getSelectedLanguage()
-        var  city = saved_info.getSelectedCity()
+        if (!hasLocationPermissions())
+        {
+            var  language = dbHelper?.getSelectedLanguage()
+            var  city = dbHelper?.getCurrentCity()
+            if (language!= null && city!= null)
+                GetAllForecasts(city, language)
+            else if (city!= null)
+                GetAllForecasts(city)
+        }
 
+
+
+
+        /*
         if (city != null) {
             saved_info.saveSelectedCity(city)
         }
@@ -124,7 +137,7 @@ class MainFragment : Fragment() {
             cur_data.live_language.value = "ru"
         }
         //getLocation("ru")
-
+        */
 
 
         /**/
@@ -134,12 +147,18 @@ class MainFragment : Fragment() {
         //HourlyRequestWeather(requireContext(),"296543")
 
     }
+    override fun onDestroy() {
+        super.onDestroy()
+        // Закрытие базы данных при уничтожении активности
+        dbHelper?.close()
+    }
     //----------------------Init------------------------------------------
     @RequiresApi(Build.VERSION_CODES.O)
     private fun Init() = with(binding)
     {
 
-        saved_info = PreferenceHelper(requireContext())
+        //saved_info = PreferenceHelper(requireContext())
+        dbHelper = DatabaseHelper(requireContext())
         f_location_client = LocationServices.getFusedLocationProviderClient(requireContext())
         val adapter = ViewPageAdapter(activity as FragmentActivity, f_list)
 
@@ -168,7 +187,7 @@ class MainFragment : Fragment() {
         }
 
         idLocationBtn.setOnClickListener {
-            var language = saved_info.getSelectedLanguage()
+            var language = dbHelper?.getSelectedLanguage()
             if (language!= null)
             {
                 checkLocation(language)
@@ -177,7 +196,7 @@ class MainFragment : Fragment() {
                 checkLocation( cur_data.live_language.value!!)
             }
             else{
-                checkLocation("ru")
+                checkLocation()
             }
 
         }
@@ -185,7 +204,7 @@ class MainFragment : Fragment() {
             DialogManager.FindByNameDialog(requireContext(), object: DialogManager.Listener{
                 override fun onClick(city_name: String?) {
                     Log.d("MyLog", "$city_name")
-                    var language = saved_info.getSelectedLanguage()
+                    var language = dbHelper?.getSelectedLanguage()
                     if (city_name != null) {
                         if (language!= null)
                         {
@@ -195,7 +214,7 @@ class MainFragment : Fragment() {
                             GetAllForecasts(city_name, cur_data.live_language.value!!)
                         }
                         else{
-                            GetAllForecasts(city_name, "ru")
+                            GetAllForecasts(city_name)
                         }
                     }
                 }
@@ -207,8 +226,8 @@ class MainFragment : Fragment() {
             DialogManager.SetLanguageDialog(requireContext(), object: DialogManager.Listener{
                 override fun onClick(language: String?) {
                     Log.d("MyLog", "$language")
-                    var last_language = saved_info.getSelectedLanguage()
-                    if (last_language != language)
+                    var last_language = dbHelper?.getSelectedLanguage()
+                    if (last_language == null || (last_language != language && language != null))
                     {
                         cur_data.live_language.value = language
                     }
@@ -244,11 +263,15 @@ class MainFragment : Fragment() {
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun PermissionChecker() {
-        if (!hasLocationPermissions()) {
+        if (!hasLocationPermissions())
             PermissionListener()
-        } else {
-            //getLocation()
-        }
+        /*
+        var language = dbHelper?.getSelectedLanguage()
+        if(language!= null)
+            getLocation(language)
+        else
+            getLocation()
+        */
     }
 
     @RequiresApi(Build.VERSION_CODES.M)
@@ -311,36 +334,47 @@ class MainFragment : Fragment() {
     private fun GetAllForecasts(cur_city_name: String, language: String = "en")
     {
         /**/
-        saved_info.saveSelectedCity(cur_city_name)
-
-        FindLocationKey(requireContext(), cur_city_name) { locationKey ->
-            if (locationKey != null && locationKey != "server_error") {
-                //Toast.makeText(activity, "Found $cur_city_name", Toast.LENGTH_SHORT).show()
-
-                DailyRequestWeather(requireContext(),locationKey, cur_city_name, language)
-                HourlyRequestWeather(requireContext(),locationKey, language)
-
-                Log.d("ML", "My Item MAIN1\n${cur_data.main_one._cur_sky} \n ${cur_data.main_one._cur_temp} \n ${cur_data.main_one._cur_sky_img_url}")
-                Log.d("ML", "MAIN2\n${cur_data.main_two._city} \n${cur_data.main_two._date}" +
-                        "\n ${cur_data.main_two._wind} \n ${cur_data.main_two._wind_direction}"+
-                        "\n ${cur_data.main_two._air_quality} \n "+
-                        "\n ${cur_data.main_two._sunrise} \n ${cur_data.main_two._sunset}")
+        dbHelper?.setCurrentCity(cur_city_name)
+        dbHelper?.setSelectedLanguage(language)
 
 
-            } else if(locationKey != "server_error") {
-                // Ключ расположения не найден или произошла ошибка,
-                var cityName = "Voronezh"
-                if (language == "ru")
-                    cityName = "Воронеж"
-                GetAllForecasts(cityName, language)
-                Toast.makeText(activity, "Sry,\n weather for ur city was not found", Toast.LENGTH_SHORT).show()
+        val retrievedCityCodes = dbHelper?.getCityCodes()
+        var loc_key:Int? =  null;
+        if (retrievedCityCodes!= null)
+            loc_key = retrievedCityCodes.get(cur_city_name)
 
-            }
-            else{
-                Toast.makeText(activity, "Sry,\nserver is temporarily unavailable or the tokens have run out", Toast.LENGTH_LONG).show()
+        if (loc_key == null)
+        {
+            FindLocationKey(requireContext(), cur_city_name) { locationKey ->
+                if (locationKey != null && locationKey != "server_error") {
+                    //Toast.makeText(activity, "Found $cur_city_name", Toast.LENGTH_SHORT).show()
+                    dbHelper?.setCityCode(cur_city_name, locationKey.toInt())
+
+                    DailyRequestWeather(requireContext(),locationKey, cur_city_name, language)
+                    HourlyRequestWeather(requireContext(),locationKey, language)
+
+
+                } else if(locationKey != "server_error") {
+                    // Ключ расположения не найден или произошла ошибка,
+                    Toast.makeText(activity, "Sry,\n weather for ur city was not found", Toast.LENGTH_SHORT).show()
+                }
+                else{
+                    Toast.makeText(activity, "Sry,\nserver is temporarily unavailable or the tokens have run out", Toast.LENGTH_LONG).show()
+                }
             }
         }
+        else
+        {
+            DailyRequestWeather(requireContext(),loc_key.toString(), cur_city_name, language)
+            HourlyRequestWeather(requireContext(),loc_key.toString(), language)
 
+        }
+
+        Log.d("ML", "My Item MAIN1\n${cur_data.main_one._cur_sky} \n ${cur_data.main_one._cur_temp} \n ${cur_data.main_one._cur_sky_img_url}")
+        Log.d("ML", "MAIN2\n${cur_data.main_two._city} \n${cur_data.main_two._date}" +
+                "\n ${cur_data.main_two._wind} \n ${cur_data.main_two._wind_direction}"+
+                "\n ${cur_data.main_two._air_quality} \n "+
+                "\n ${cur_data.main_two._sunrise} \n ${cur_data.main_two._sunset}")
     }
     @RequiresApi(Build.VERSION_CODES.O)
     private fun DailyRequestWeather(context: Context, locationKey: String, city_name: String, language: String = "en") {
@@ -629,7 +663,7 @@ class MainFragment : Fragment() {
             //cur_data.live_language.value?.let { it1 -> checkLocation(it1) }
             if (languageCode!="null")
             {
-                saved_info.saveSelectedLanguage(languageCode)
+                dbHelper?.setSelectedLanguage(languageCode)
                 when (languageCode) {
                     "en" -> {
 
@@ -655,7 +689,7 @@ class MainFragment : Fragment() {
                             configuration.locale = locale
                             resources.updateConfiguration(configuration, resources.displayMetrics)
 
-                            val last_city = saved_info.getSelectedCity()
+                            val last_city = dbHelper?.getCurrentCity()
                             if (last_city != null)
                             {
                                 GetAllForecasts(last_city, languageCode)
@@ -689,7 +723,8 @@ class MainFragment : Fragment() {
                             {
                                     tab, pos -> tab.text = hd_title_list_ru[pos]
                             }.attach()
-                            val last_city = saved_info.getSelectedCity()
+
+                            val last_city = dbHelper?.getCurrentCity()
                             if (last_city != null)
                             {
                                 GetAllForecasts(last_city, languageCode)
@@ -698,7 +733,6 @@ class MainFragment : Fragment() {
                             {
                                 checkLocation(languageCode)
                             }
-
                     }
                     else -> {
 
