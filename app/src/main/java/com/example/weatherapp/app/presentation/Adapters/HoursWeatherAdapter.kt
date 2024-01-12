@@ -1,4 +1,4 @@
-package com.example.weatherapp.Adapters
+package com.example.weatherapp.app.presentation.Adapters
 
 import android.view.LayoutInflater
 import android.view.View
@@ -6,7 +6,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.example.weatherapp.DataModels.WeatherHoursModel
+import com.example.weatherapp.app.core.entities.DataModels.WeatherHoursModel
 import com.example.weatherapp.R
 import com.example.weatherapp.databinding.HoursListItemBinding
 import com.squareup.picasso.Picasso

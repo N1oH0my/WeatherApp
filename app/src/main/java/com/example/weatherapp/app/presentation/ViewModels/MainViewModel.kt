@@ -1,10 +1,10 @@
-package com.example.weatherapp.ViewModels
+package com.example.weatherapp.app.presentation.ViewModels
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.weatherapp.DataModels.WeatherDayItem
-import com.example.weatherapp.DataModels.WeatherHoursModel
-import com.example.weatherapp.DataModels.WeatherNowModel
+import com.example.weatherapp.app.core.entities.DataModels.WeatherDayItem
+import com.example.weatherapp.app.core.entities.DataModels.WeatherHoursModel
+import com.example.weatherapp.app.core.entities.DataModels.WeatherNowModel
 
 class MainViewModel: ViewModel() {
     var mobile_link: String? = null

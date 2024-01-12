@@ -1,3 +1,5 @@
+package com.example.weatherapp.app.framework.database
+
 import android.content.Context
 import android.content.SharedPreferences
 

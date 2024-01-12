@@ -1,4 +1,4 @@
-package com.example.weatherapp.DataModels
+package com.example.weatherapp.app.core.entities.DataModels
 
 data class WeatherNowModel(
     var _city: String = "null",

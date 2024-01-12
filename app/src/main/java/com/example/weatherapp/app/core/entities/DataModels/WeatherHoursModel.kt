@@ -1,4 +1,4 @@
-package com.example.weatherapp.DataModels
+package com.example.weatherapp.app.core.entities.DataModels
 
 data class WeatherHoursModel(
     //val _location_key: String,

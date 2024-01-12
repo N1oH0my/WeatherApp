@@ -1,6 +1,6 @@
-package com.example.weatherapp.Fragments
+package com.example.weatherapp.app.presentation.view.Fragments
 
-import PreferenceHelper
+import com.example.weatherapp.app.framework.database.PreferenceHelper
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
@@ -32,10 +32,10 @@ import com.android.volley.Response
 import com.android.volley.toolbox.JsonArrayRequest
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
-import com.example.weatherapp.Adapters.ViewPageAdapter
-import com.example.weatherapp.DataModels.WeatherDayItem
-import com.example.weatherapp.DataModels.WeatherHoursModel
-import com.example.weatherapp.ViewModels.MainViewModel
+import com.example.weatherapp.app.presentation.Adapters.ViewPageAdapter
+import com.example.weatherapp.app.core.entities.DataModels.WeatherDayItem
+import com.example.weatherapp.app.core.entities.DataModels.WeatherHoursModel
+import com.example.weatherapp.app.presentation.ViewModels.MainViewModel
 import com.example.weatherapp.databinding.FragmentMainBinding
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
@@ -45,23 +45,21 @@ import org.json.JSONObject
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import android.provider.Settings
-import com.example.weatherapp.DataModels.WeatherNowModel
+import com.example.weatherapp.app.core.usecases.ParseDateString
+import com.example.weatherapp.app.core.usecases.getWeatherAPI
+import com.example.weatherapp.app.core.usecases.ParseTimeString
 import com.squareup.picasso.Picasso
-import kotlinx.coroutines.delay
 import java.util.Locale
 
 
 class MainFragment : Fragment() {
 
-    //private val WEATHER_API_KEY: String = "ZhvnfeXeICWsbRy1Xy0hxUN2ajAtfLnV"
-    //private val WEATHER_API_KEY: String = "FPv7HgXJ8uHDgICrYKtJmwyj67bsf00G"
-    private val WEATHER_API_KEY: String = "fGr9YGaFhvwwHk3hnso0j5UfT0HzVrLn"
     private lateinit var binding: FragmentMainBinding
     private lateinit var p_launcher: ActivityResultLauncher<String>
     private lateinit var f_location_client: FusedLocationProviderClient
 
     private val cur_data: MainViewModel by activityViewModels()
-    private lateinit var saved_info:PreferenceHelper
+    private lateinit var saved_info: PreferenceHelper
 
     private var f_list = listOf(
         HoursFragment.newInstance(),
@@ -96,6 +94,7 @@ class MainFragment : Fragment() {
             WindowManager.LayoutParams.FLAG_FULLSCREEN,
             WindowManager.LayoutParams.FLAG_FULLSCREEN);
         //---
+
         UpdateCurrentData()
         UpdateCurrentDataLanguage()
         Init()
@@ -182,19 +181,16 @@ class MainFragment : Fragment() {
 
         }
         idSearchBtn.setOnClickListener {
-            DialogManager.FindByNameDialog(requireContext(), object: DialogManager.Listener{
+            DialogManager.FindByNameDialog(requireContext(), object : DialogManager.Listener {
                 override fun onClick(city_name: String?) {
                     Log.d("MyLog", "$city_name")
                     var language = saved_info.getSelectedLanguage()
                     if (city_name != null) {
-                        if (language!= null)
-                        {
+                        if (language != null) {
                             GetAllForecasts(city_name, language)
-                        }
-                        else if (cur_data.live_language.value != null) {
+                        } else if (cur_data.live_language.value != null) {
                             GetAllForecasts(city_name, cur_data.live_language.value!!)
-                        }
-                        else{
+                        } else {
                             GetAllForecasts(city_name, "ru")
                         }
                     }
@@ -204,12 +200,11 @@ class MainFragment : Fragment() {
         }
 
         idSetLanguage.setOnClickListener {
-            DialogManager.SetLanguageDialog(requireContext(), object: DialogManager.Listener{
+            DialogManager.SetLanguageDialog(requireContext(), object : DialogManager.Listener {
                 override fun onClick(language: String?) {
                     Log.d("MyLog", "$language")
                     var last_language = saved_info.getSelectedLanguage()
-                    if (last_language != language)
-                    {
+                    if (last_language != language) {
                         cur_data.live_language.value = language
                     }
                 }
@@ -349,7 +344,7 @@ class MainFragment : Fragment() {
         val url =
             "http://dataservice.accuweather.com/forecasts/v1/daily/5day/" +
                     "$locationKey?" +
-                    "apikey=$WEATHER_API_KEY&" +
+                    "apikey=${getWeatherAPI(requireContext())}&" +
                     "language=$language&details=true&metric=true"
 
         val jsonArrayRequest = JsonObjectRequest(Request.Method.GET, url, null,
@@ -387,7 +382,7 @@ class MainFragment : Fragment() {
         val url =
             "http://dataservice.accuweather.com/forecasts/v1/hourly/12hour/" +
                     "$locationKey?" +
-                    "apikey=$WEATHER_API_KEY&" +
+                    "apikey=${getWeatherAPI(requireContext())}&" +
                     "language=$language&details=true&metric=true"
 
         val jsonArrayRequest = JsonArrayRequest(Request.Method.GET, url, null,
@@ -410,7 +405,7 @@ class MainFragment : Fragment() {
     }
     private fun FindLocationKey(context: Context, city: String,language: String = "en", callback: (String?) -> Unit) {
         val url = "http://dataservice.accuweather.com/locations/v1/cities/search?apikey=" +
-                "$WEATHER_API_KEY&q=" +
+                "${getWeatherAPI(requireContext())}&q=" +
                 "$city" +
                 "&language=$language&details=false&offset=1"
 
@@ -537,26 +532,7 @@ class MainFragment : Fragment() {
         cur_data.live_data_days.value = (item_list)
         cur_data.live_data_main_two.value = cur_data.main_two
     }
-    private fun ParseTimeString(input: String): String {
-        val regex = Regex("T(\\d{2}):(\\d{2})")
-        val matchResult = regex.find(input)
 
-        var time: String = "null"
-
-        return matchResult?.let { result ->
-            val hour = result.groupValues[1].toInt()
-            val minute = result.groupValues[2].toInt()
-
-            time = if (hour > 12) {
-                val formattedHour = (hour - 12).toString().padStart(2, '0')
-                "$formattedHour:${result.groupValues[2]} pm"
-            } else {
-                "$hour:${result.groupValues[2]} am"
-            }
-
-            time
-        }?: time
-    }
     @RequiresApi(Build.VERSION_CODES.O)
     /*fun ParseDateString(dateString: String): String {
         val formatterIn = DateTimeFormatter.ISO_OFFSET_DATE_TIME
@@ -567,28 +543,15 @@ class MainFragment : Fragment() {
 
         return formattedDate
     }*/
-    fun ParseDateString(dateString: String, language: String): String {
-        val formatterIn = DateTimeFormatter.ISO_OFFSET_DATE_TIME
-        val formatterOut = when (language.toLowerCase()) {
-            "ru" -> DateTimeFormatter.ofPattern("d MMMM", Locale("ru"))
-            "en" -> DateTimeFormatter.ofPattern("d MMMM", Locale("en"))
-            else -> throw IllegalArgumentException("Unsupported language: $language")
-        }
 
-        val dateTime = LocalDateTime.parse(dateString, formatterIn)
-        val formattedDate = dateTime.format(formatterOut)
-
-        return formattedDate
-    }
     //------------------------DialogManager----------------------------------------
-    @RequiresApi(Build.VERSION_CODES.O)
     private fun checkLocation(language: String = "en") {
 
         if (isLocationEnabled()) {
             getLocation(language)
         } else {
             //getLocation()
-            DialogManager.LocationSettingsDialog(requireContext (), object : DialogManager.Listener{
+            DialogManager.LocationSettingsDialog(requireContext(), object : DialogManager.Listener {
                 override fun onClick(city_name: String?) {
                     startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
                 }

@@ -1,4 +1,4 @@
-package com.example.weatherapp.Adapters
+package com.example.weatherapp.app.presentation.Adapters
 
 import android.content.Context
 import android.provider.Settings.System.getString
@@ -8,7 +8,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.example.weatherapp.DataModels.WeatherDayItem
+import com.example.weatherapp.app.core.entities.DataModels.WeatherDayItem
 import com.example.weatherapp.R
 import com.example.weatherapp.databinding.DaysListItemBinding
 import com.squareup.picasso.Picasso

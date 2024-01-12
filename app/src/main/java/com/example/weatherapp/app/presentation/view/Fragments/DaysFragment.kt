@@ -1,4 +1,4 @@
-package com.example.weatherapp.Fragments
+package com.example.weatherapp.app.presentation.view.Fragments
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -7,9 +7,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.weatherapp.Adapters.DaysWeatherAdapter
-import com.example.weatherapp.DataModels.WeatherDayItem
-import com.example.weatherapp.ViewModels.MainViewModel
+import com.example.weatherapp.app.presentation.Adapters.DaysWeatherAdapter
+import com.example.weatherapp.app.core.entities.DataModels.WeatherDayItem
+import com.example.weatherapp.app.presentation.ViewModels.MainViewModel
 import com.example.weatherapp.databinding.FragmentDaysBinding
 
 
