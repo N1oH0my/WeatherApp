@@ -3,4 +3,7 @@
     <color name="colorPrimary">@color/white</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="background">#5954296A</color>
+    <color name="cardBackground">#1A54296A</color>
+    <color name="text">#0E0721</color>
 </resources>

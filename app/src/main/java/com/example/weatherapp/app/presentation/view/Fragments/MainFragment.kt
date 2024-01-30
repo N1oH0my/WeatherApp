@@ -379,10 +379,10 @@ class MainFragment : Fragment() {
                             idSupport.text = "Поддержка"
                             idSetLanguage.text = "Язык"
                             idSeeMoreDetails.text = "Посмотреть подробнее"
-                            idTextAir.text = "Категория воздуха:"
-                            idTextWind.text = "Ветер:"
-                            idTextSunrise.text = "Восход:"
-                            idTextSunset.text = "Закат:"
+                            idTextAir.text = "Категория воздуха"
+                            idTextWind.text = "Ветер"
+                            idTextSunrise.text = "Восход"
+                            idTextSunset.text = "Закат"
                             idBy.text = "создано N1oH0my"
 
                             val locale = Locale("ru")

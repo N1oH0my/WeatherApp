@@ -7,7 +7,6 @@
     android:layout_gravity="center|top"
     android:background="@android:color/transparent"
     app:cardBackgroundColor="@android:color/transparent"
-    app:cardCornerRadius="15dp"
     app:cardElevation="0dp"
     app:cardPreventCornerOverlap="false">
 
@@ -15,18 +14,19 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:background="#4D3C1B60">
+        android:background="@color/cardBackground">
 
         <ImageView
             android:id="@+id/id_d_day_sky_img"
             android:layout_width="80dp"
             android:layout_height="80dp"
 
-            android:layout_marginEnd="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
             android:contentDescription="@string/app_name"
-            app:layout_constraintBottom_toBottomOf="@+id/id_text_d_day"
-            app:layout_constraintEnd_toStartOf="@+id/id_d_temp_max"
-            app:layout_constraintTop_toTopOf="@+id/id_text_d_day"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/id_d_wind"
             app:srcCompat="@drawable/ic_launcher_foreground" />
 
         <ImageView
@@ -34,45 +34,51 @@
             android:layout_width="80dp"
             android:layout_height="80dp"
 
+            android:layout_marginTop="10dp"
             android:layout_marginEnd="10dp"
+            android:layout_marginBottom="10dp"
             android:contentDescription="@string/app_name"
-            app:layout_constraintBottom_toBottomOf="@+id/id_text_d_night"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/id_d_temp_min"
-            app:layout_constraintTop_toTopOf="@+id/id_text_d_night"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toEndOf="@+id/id_d_date"
+            app:layout_constraintTop_toBottomOf="@+id/id_d_wind"
             app:srcCompat="@drawable/ic_launcher_foreground" />
 
         <TextView
             android:id="@+id/id_d_temp_max"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
             android:layout_marginTop="20dp"
-            android:layout_marginEnd="40dp"
             android:backgroundTint="#54296A"
             android:fontFamily="@font/amiko_semibold"
             android:gravity="end"
             android:text="27 *C"
             android:textAllCaps="false"
-            android:textColor="#0E0721"
-            android:textSize="24sp"
+            android:textColor="@color/text"
+            android:textSize="@dimen/text_size_large"
             app:layout_constraintBottom_toBottomOf="@+id/id_d_day_sky_img"
             app:layout_constraintEnd_toStartOf="@+id/id_d_date"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toEndOf="@+id/id_d_day_sky_img"
             app:layout_constraintTop_toTopOf="@+id/id_d_day_sky_img"
-            app:layout_constraintVertical_bias="0.0"></TextView>
+            app:layout_constraintVertical_bias="0.035"></TextView>
 
         <TextView
             android:id="@+id/id_d_temp_min"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="40dp"
+            android:layout_marginEnd="16dp"
             android:backgroundTint="#54296A"
             android:fontFamily="@font/amiko_semibold"
             android:gravity="start"
             android:text="27 *C"
             android:textAllCaps="false"
-            android:textColor="#0E0721"
-            android:textSize="24sp"
-            app:layout_constraintBottom_toBottomOf="@+id/id_d_night_sky_img"
-            app:layout_constraintEnd_toStartOf="@+id/id_d_wind"
+            android:textColor="@color/text"
+            android:textSize="@dimen/text_size_large"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@+id/id_d_night_sky_img">
 
         </TextView>
@@ -81,81 +87,32 @@
             android:id="@+id/id_d_date"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="25dp"
-            android:layout_marginEnd="20dp"
+            android:layout_marginTop="15dp"
             android:backgroundTint="#54296A"
             android:fontFamily="@font/amiko_semibold"
             android:gravity="end"
             android:text="31 July"
             android:textAllCaps="false"
-            android:textColor="#0E0721"
-            android:textSize="16sp"
-            app:layout_constraintBottom_toTopOf="@+id/id_d_text_wind"
+            android:textColor="@color/white"
+            android:textSize="@dimen/text_size_large"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.0">
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
         </TextView>
-
-        <TextView
-            android:id="@+id/id_text_d_day"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="5dp"
-            android:layout_marginTop="30dp"
-            android:layout_marginEnd="5dp"
-            android:layout_marginBottom="50dp"
-            android:fontFamily="@font/amiko_semibold"
-            android:text="Day:"
-            android:textColor="#0E0721"
-            android:textSize="20sp"
-            app:layout_constraintBottom_toTopOf="@+id/id_text_d_night"
-            app:layout_constraintEnd_toStartOf="@+id/id_d_day_sky_img"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.0" />
-
-        <TextView
-            android:id="@+id/id_text_d_night"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="5dp"
-            android:layout_marginEnd="5dp"
-            android:layout_marginBottom="30dp"
-            android:fontFamily="@font/amiko_semibold"
-            android:text="Night:"
-            android:textColor="#0E0721"
-            android:textSize="20sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/id_d_night_sky_img"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent" />
-
-        <TextView
-            android:id="@+id/id_d_text_wind"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="20dp"
-            android:fontFamily="@font/amiko_semibold"
-            android:text="Wind:"
-            android:textColor="#0E0721"
-            android:textSize="16sp"
-            app:layout_constraintBottom_toTopOf="@+id/id_d_wind"
-            app:layout_constraintEnd_toEndOf="parent" />
 
         <TextView
             android:id="@+id/id_d_wind"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="5dp"
-            android:layout_marginBottom="20dp"
+            android:layout_marginTop="10dp"
             android:fontFamily="@font/amiko_semibold"
             android:text="5 km/h ЮЮЗ"
-            android:textColor="#0E0721"
-            android:textSize="16sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
+            android:textColor="@color/text"
+            android:textSize="@dimen/text_size_medium"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/id_d_date" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

@@ -7,7 +7,6 @@
     android:layout_marginStart="0dp"
     android:background="@android:color/transparent"
     app:cardBackgroundColor="@android:color/transparent"
-    app:cardCornerRadius="15dp"
     app:cardElevation="0dp"
     app:cardPreventCornerOverlap="false">
 
@@ -15,26 +14,25 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="center|top"
-        android:background="#332E154A">
+        android:background="@color/cardBackground">
 
         <TextView
             android:id="@+id/id_h_sky"
-            android:layout_width="wrap_content"
+            android:layout_width="170sp"
             android:layout_height="wrap_content"
             android:layout_marginStart="5dp"
-            android:layout_marginTop="10dp"
             android:layout_marginEnd="5dp"
             android:backgroundTint="#54296A"
             android:fontFamily="@font/amiko_semibold"
             android:gravity="center"
             android:text="Sunny"
             android:textAllCaps="false"
-            android:textColor="#0E0721"
-            android:textSize="24sp"
-            app:layout_constraintBottom_toTopOf="@+id/id_h_sky_img"
+            android:textColor="@color/text"
+            android:textSize="@dimen/text_size_large"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintStart_toEndOf="@+id/id_h_temp"
+            app:layout_constraintTop_toBottomOf="@+id/id_h_time">
 
         </TextView>
 
@@ -42,17 +40,17 @@
             android:id="@+id/id_h_temp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="16dp"
+            android:layout_marginStart="15dp"
             android:backgroundTint="#54296A"
             android:fontFamily="@font/amiko_semibold"
             android:gravity="end"
             android:text="27 *C"
             android:textAllCaps="false"
-            android:textColor="#0E0721"
+            android:textColor="@color/text"
             android:textSize="30sp"
-            app:layout_constraintBottom_toBottomOf="@+id/id_h_time"
-            app:layout_constraintEnd_toStartOf="@+id/id_h_time"
-            app:layout_constraintTop_toTopOf="@+id/id_h_time">
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/id_h_sky_img"
+            app:layout_constraintTop_toTopOf="@+id/id_h_sky_img">
 
         </TextView>
 
@@ -60,16 +58,18 @@
             android:id="@+id/id_h_time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="10dp"
-            android:layout_marginBottom="20dp"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="5dp"
             android:backgroundTint="#54296A"
             android:fontFamily="@font/amiko_semibold"
             android:text="10:00 am"
             android:textAllCaps="false"
-            android:textColor="#0E0721"
-            android:textSize="24sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent">
+            android:textColor="@color/white"
+            android:textSize="@dimen/text_size_large"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
         </TextView>
 
@@ -79,12 +79,12 @@
             android:layout_height="80dp"
             android:layout_marginStart="5dp"
 
+            android:layout_marginTop="10dp"
             android:contentDescription="@string/app_name"
             android:foregroundGravity="left"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/id_h_temp"
-            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/id_h_time"
             app:srcCompat="@drawable/ic_launcher_foreground" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>

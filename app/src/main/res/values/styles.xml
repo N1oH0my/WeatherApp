@@ -3,7 +3,8 @@
     <style name="TabLayoutStyle" parent="Widget.Design.TabLayout">
         <item name="tabTextColor">#FFFFFF</item>
         <item name="android:fontFamily">@font/amiko_semibold</item>
-        <item name="android:background">@color/white</item>
+        <item name="android:background">@drawable/tab_item_background</item>
         <item name="android:textColorPrimary">@android:color/white</item>
+        <item name="tabBackground">@drawable/tab_item_background</item>
     </style>
 </resources>

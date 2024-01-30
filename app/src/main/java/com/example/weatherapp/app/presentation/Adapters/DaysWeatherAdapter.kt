@@ -18,9 +18,9 @@ class DaysWeatherAdapter: ListAdapter<WeatherDayItem, DaysWeatherAdapter.Holder>
     class Holder(view: View): RecyclerView.ViewHolder(view) {
         val binding = DaysListItemBinding.bind(view)
         fun bind(item: WeatherDayItem, context: Context) = with(binding) {
-            idTextDDay.text = context.getString(R.string.Day)
+            /*idTextDDay.text = context.getString(R.string.Day)
             idTextDNight.text = context.getString(R.string.Night)
-            idDTextWind.text = context.getString(R.string.Wind)
+            idDTextWind.text = context.getString(R.string.Wind)*/
 
             idDDate.text = item._date
             idDTempMax.text = item._max_temp
