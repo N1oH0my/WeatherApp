@@ -24,6 +24,6 @@
 <img src="https://github.com/N1oH0my/WeatherApp/blob/mainBranch/img/7.jpg" alt="Alt текст">
 <img src="https://github.com/N1oH0my/WeatherApp/blob/mainBranch/img/8.jpg" alt="Alt текст">
 
-<li>Данные хранятся в "MutableLiveData MutableList(Cocktail)" с подпиской на изменения.</li>
+<li>Данные хранятся в LiveData.</li>
 <li>Для сохранения данных используется SharedPreferences.</li>
 <li>Также используется binding для упрощения работы с xml.</li>
